@@ -1,37 +1,59 @@
 // Authentication & Cart Functions
 
 // Determine API URL based on environment
-const API_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:5000' 
+const API_URL = window.location.hostname === 'localhost'
+    ? 'http://localhost:5000'
     : window.location.origin;
 
 // Check if user is logged in and update navbar
 function checkAuth() {
     const token = localStorage.getItem('token');
     const userRole = localStorage.getItem('userRole');
+
     const authButtons = document.getElementById('authButtons');
     const userMenu = document.getElementById('userMenu');
     const ordersLink = document.getElementById('ordersLink');
+    const adminBtn = document.getElementById('adminBtn');
 
     if (token) {
-        authButtons.style.display = 'none';
-        userMenu.style.display = 'flex';
-        if (ordersLink) ordersLink.style.display = 'block';
-        
+
+        if (authButtons) {
+            authButtons.style.display = 'none';
+        }
+
+        if (userMenu) {
+            userMenu.style.display = 'flex';
+        }
+
+        if (ordersLink) {
+            ordersLink.style.display = 'block';
+        }
+
         loadNavbarProfileImage();
-        
-        if (userRole === 'admin') {
-            document.getElementById('adminBtn').style.display = 'block';
-            document.getElementById('adminBtn').onclick = () => {
+
+        if (userRole === 'admin' && adminBtn) {
+            adminBtn.style.display = 'block';
+
+            adminBtn.onclick = () => {
                 window.location.href = 'admin.html';
             };
         }
-        
+
         updateCartCount();
+
     } else {
-        authButtons.style.display = 'flex';
-        userMenu.style.display = 'none';
-        if (ordersLink) ordersLink.style.display = 'none';
+
+        if (authButtons) {
+            authButtons.style.display = 'flex';
+        }
+
+        if (userMenu) {
+            userMenu.style.display = 'none';
+        }
+
+        if (ordersLink) {
+            ordersLink.style.display = 'none';
+        }
     }
 }
 
@@ -41,13 +63,18 @@ function loadNavbarProfileImage() {
     if (!token) return;
 
     fetch(`${API_URL}/api/users/profile-image`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
     })
     .then(res => res.json())
     .then(data => {
+
         const navImage = document.getElementById('navProfileImage');
         const navIcon = document.getElementById('navProfileIcon');
-        
+
+        if (!navImage || !navIcon) return;
+
         if (data.profileImage) {
             navImage.src = data.profileImage;
             navImage.style.display = 'block';
@@ -63,21 +90,27 @@ function loadNavbarProfileImage() {
 // Update cart count in navbar
 function updateCartCount() {
     const token = localStorage.getItem('token');
+
+    const cartCount = document.getElementById('cartCount');
+
+    if (!cartCount) return;
+
     if (!token) {
-        document.getElementById('cartCount').textContent = '0';
+        cartCount.textContent = '0';
         return;
     }
 
     fetch(`${API_URL}/api/cart`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
     })
     .then(res => res.json())
     .then(items => {
-        const count = items.length;
-        document.getElementById('cartCount').textContent = count;
+        cartCount.textContent = items.length;
     })
     .catch(err => {
-        document.getElementById('cartCount').textContent = '0';
+        cartCount.textContent = '0';
     });
 }
 
@@ -87,6 +120,7 @@ function logout() {
     localStorage.removeItem('userId');
     localStorage.removeItem('userName');
     localStorage.removeItem('userRole');
+
     window.location.href = 'index.html';
 }
 
