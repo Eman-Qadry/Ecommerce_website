@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - BookStore</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>📚 BookStore</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="products.html" class="nav-link">Products</a>
+                <a href="cart.html" class="nav-link" id="cartLink">Cart <span id="cartCount">0</span></a>
+                <a href="orders.html" class="nav-link" id="ordersLink" style="display: none;">Orders</a>
+                <div id="authButtons">
+                    <a href="login.html" class="nav-link">Login</a>
+                    <a href="register.html" class="btn btn-primary btn-small">Register</a>
+                </div>
+                <div id="userMenu" style="display: none;">
+                    <a href="profile.html" class="profile-nav-link">
+                        <img id="navProfileImage" src="" alt="Profile" class="nav-profile-pic">
+                        <span id="navProfileIcon" class="nav-profile-icon">👤</span>
+                    </a>
+                    <button id="adminBtn" class="btn btn-small" style="display: none; background-color: #3498db; color: white; border: none;">Admin</button>
+                    <button onclick="logout()" class="btn btn-primary btn-small" style="margin-left: auto;">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>Shopping Cart</h2>
+        <div class="cart-page">
+            <div class="cart-items">
+                <div id="cartContainer">
+                    <!-- Cart items will be loaded here -->
+                </div>
+            </div>
+            <div class="cart-summary">
+                <h3>Order Summary</h3>
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span id="subtotal">$0.00</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping:</span>
+                    <span>$5.00</span>
+                </div>
+                <div class="summary-row total">
+                    <span>Total:</span>
+                    <span id="total">$5.00</span>
+                </div>
+                <button onclick="checkout()" class="btn btn-primary btn-large">Proceed to Checkout</button>
+                <a href="products.html" class="btn btn-secondary btn-large">Continue Shopping</a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 BookStore. All rights reserved.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadCart();
+        });
+
+        function loadCart() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                document.getElementById('cartContainer').innerHTML = '<p>Please login to view your cart</p>';
+                return;
+            }
+
+            fetch('http://localhost:5000/api/cart', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(items => {
+                const container = document.getElementById('cartContainer');
+                if (items.length === 0) {
+                    container.innerHTML = '<p>Your cart is empty</p>';
+                    document.getElementById('subtotal').textContent = '$0.00';
+                    document.getElementById('total').textContent = '$5.00';
+                    return;
+                }
+
+                let subtotal = 0;
+                container.innerHTML = items.map(item => {
+                    const itemTotal = item.price * item.quantity;
+                    subtotal += itemTotal;
+                    return `
+                        <div class="cart-item">
+                            <img src="${item.image_url}" alt="${item.title}">
+                            <div class="cart-item-info">
+                                <h4>${item.title}</h4>
+                                <p>${item.author}</p>
+                                <p class="price">$${item.price}</p>
+                            </div>
+                            <div class="cart-item-controls">
+                                <input type="number" value="${item.quantity}" min="1" 
+                                    onchange="updateQuantity(${item.id}, this.value)" class="quantity-input">
+                                <p>$${itemTotal.toFixed(2)}</p>
+                                <button onclick="removeFromCart(${item.id})" class="btn btn-danger">Remove</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                document.getElementById('subtotal').textContent = `$${subtotal.toFixed(2)}`;
+                document.getElementById('total').textContent = `$${(subtotal + 5).toFixed(2)}`;
+            });
+        }
+
+        function updateQuantity(cartId, quantity) {
+            const token = localStorage.getItem('token');
+            fetch(`http://localhost:5000/api/cart/${cartId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ quantity: parseInt(quantity) })
+            })
+            .then(() => loadCart())
+            .catch(err => {
+                console.error('Error updating quantity:', err);
+                alert('Error updating quantity');
+            });
+        }
+
+        function removeFromCart(cartId) {
+            const token = localStorage.getItem('token');
+            fetch(`http://localhost:5000/api/cart/${cartId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(() => {
+                loadCart();
+                updateCartCount();
+            })
+            .catch(err => {
+                console.error('Error removing item:', err);
+                alert('Error removing item');
+            });
+        }
+
+        function checkout() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Please login to checkout');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            fetch('http://localhost:5000/api/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert('Order placed successfully!');
+                    window.location.href = 'orders.html';
+                }
+            })
+            .catch(err => {
+                console.error('Error placing order:', err);
+                alert('Error placing order');
+            });
+        }
+    </script>
+</body>
+</html>

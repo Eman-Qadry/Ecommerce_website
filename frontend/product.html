@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - BookStore</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>📚 BookStore</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="products.html" class="nav-link">Products</a>
+                <a href="cart.html" class="nav-link" id="cartLink">Cart <span id="cartCount">0</span></a>
+                <a href="orders.html" class="nav-link" id="ordersLink" style="display: none;">Orders</a>
+                <div id="authButtons">
+                    <a href="login.html" class="nav-link">Login</a>
+                    <a href="register.html" class="btn btn-primary btn-small">Register</a>
+                </div>
+                <div id="userMenu" style="display: none;">
+                    <a href="profile.html" class="profile-nav-link">
+                        <img id="navProfileImage" src="" alt="Profile" class="nav-profile-pic">
+                        <span id="navProfileIcon" class="nav-profile-icon">👤</span>
+                    </a>
+                    <button id="adminBtn" class="btn btn-small" style="display: none; background-color: #3498db; color: white; border: none;">Admin</button>
+                    <button onclick="logout()" class="btn btn-primary btn-small" style="margin-left: auto;">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="product-detail">
+            <div class="product-image">
+                <img id="productImage" src="" alt="Product">
+            </div>
+            <div class="product-info">
+                <h2 id="productTitle"></h2>
+                <p class="author" id="productAuthor"></p>
+                <div class="product-meta">
+                    <span id="productCategory"></span>
+                </div>
+                <p id="productDescription"></p>
+                <div class="price-section">
+                    <h3 id="productPrice" class="price"></h3>
+                    <p id="stockStatus" class="stock"></p>
+                </div>
+                <div class="add-to-cart-section">
+                    <label>Quantity:</label>
+                    <input type="number" id="quantity" value="1" min="1" class="quantity-input">
+                    <button onclick="addToCart()" class="btn btn-primary btn-large">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 BookStore. All rights reserved.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        let productId;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            const params = new URLSearchParams(window.location.search);
+            productId = params.get('id');
+            if (productId) loadProductDetails();
+        });
+
+        function loadProductDetails() {
+            fetch(`http://localhost:5000/api/products/${productId}`)
+                .then(res => res.json())
+                .then(product => {
+                    document.getElementById('productImage').src = product.image_url;
+                    document.getElementById('productTitle').textContent = product.title;
+                    document.getElementById('productAuthor').textContent = `by ${product.author}`;
+                    document.getElementById('productCategory').textContent = product.category || 'General';
+                    document.getElementById('productDescription').textContent = product.description || 'No description available';
+                    document.getElementById('productPrice').textContent = `$${product.price}`;
+                    document.getElementById('stockStatus').textContent = product.stock > 0 ? 'In Stock' : 'Out of Stock';
+                    document.getElementById('stockStatus').className = product.stock > 0 ? 'stock in-stock' : 'stock out-stock';
+                })
+                .catch(err => {
+                    console.error('Error loading product:', err);
+                    document.getElementById('productTitle').textContent = 'Product not found';
+                });
+        }
+
+        function addToCart() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert('Please login to add items to cart');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const quantity = parseInt(document.getElementById('quantity').value);
+            if (quantity <= 0) {
+                alert('Please enter a valid quantity');
+                return;
+            }
+
+            fetch('http://localhost:5000/api/cart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ product_id: parseInt(productId), quantity })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('Added to cart!');
+                updateCartCount();
+            })
+            .catch(err => {
+                console.error('Error adding to cart:', err);
+                alert('Error adding to cart');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BookStore - Home</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>📚 BookStore</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="products.html" class="nav-link">Products</a>
+                <a href="cart.html" class="nav-link" id="cartLink">Cart <span id="cartCount">0</span></a>
+                <a href="orders.html" class="nav-link" id="ordersLink" style="display: none;">Orders</a>
+                <div id="authButtons">
+                    <a href="login.html" class="nav-link">Login</a>
+                    <a href="register.html" class="btn btn-primary btn-small">Register</a>
+                </div>
+                <div id="userMenu" style="display: none;">
+                    <a href="profile.html" class="profile-nav-link">
+                        <img id="navProfileImage" src="" alt="Profile" class="nav-profile-pic">
+                        <span id="navProfileIcon" class="nav-profile-icon">👤</span>
+                    </a>
+                    <button id="adminBtn" class="btn btn-small" style="display: none; background-color: #3498db; color: white; border: none;">Admin</button>
+                    <button onclick="logout()" class="btn btn-primary btn-small" style="margin-left: auto;">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <div class="hero-content">
+            <h2>Welcome to BookStore</h2>
+            <p>Discover thousands of books from around the world</p>
+            <a href="products.html" class="btn btn-primary btn-large">Shop Now</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <section class="featured-books">
+            <h3>Featured Books</h3>
+            <div id="featuredProducts" class="products-grid">
+                <!-- Products will be loaded here -->
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 BookStore. All rights reserved.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadFeaturedProducts();
+        });
+
+        function loadFeaturedProducts() {
+            fetch('http://localhost:5000/api/products?search=')
+                .then(res => res.json())
+                .then(products => {
+                    const featured = products.slice(0, 6);
+                    const container = document.getElementById('featuredProducts');
+                    container.innerHTML = featured.map(product => `
+                        <div class="product-card">
+                            <img src="${product.image_url}" alt="${product.title}">
+                            <h4>${product.title}</h4>
+                            <p class="author">by ${product.author}</p>
+                            <p class="price">$${product.price}</p>
+                            <p class="stock ${product.stock > 0 ? 'in-stock' : 'out-stock'}">
+                                ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                            </p>
+                            <button onclick="viewProduct(${product.id})" class="btn btn-primary">View</button>
+                        </div>
+                    `).join('');
+                });
+        }
+
+        function viewProduct(id) {
+            window.location.href = `product.html?id=${id}`;
+        }
+    </script>
+</body>
+</html>

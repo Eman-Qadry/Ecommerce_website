@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - BookStore</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .profile-page {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .profile-page h1 {
+            font-size: 2.5rem;
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .profile-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 40px;
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .profile-left {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .profile-pic-container {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 4px solid #3498db;
+            background: #ecf0f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .profile-pic-large {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .profile-pic-icon-large {
+            font-size: 4rem;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-pic-upload {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        #profileImageInput {
+            display: none;
+        }
+
+        .profile-pic-upload label {
+            width: 100%;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .profile-pic-upload label:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+        }
+
+        .profile-pic-upload .upload-note {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            text-align: center;
+        }
+
+        .profile-right {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .profile-info-section {
+            border: 1px solid #ecf0f1;
+            border-radius: 8px;
+            padding: 25px;
+            background: #f9f9f9;
+            transition: all 0.3s;
+        }
+
+        .profile-info-section:hover {
+            border-color: #3498db;
+            background: #fff;
+        }
+
+        .profile-info-section h3 {
+            color: #2c3e50;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-info-section.danger {
+            border-color: #e74c3c;
+            background: #fadbd8;
+        }
+
+        .profile-info-section.danger:hover {
+            border-color: #c0392b;
+        }
+
+        .profile-info-section.danger h3 {
+            color: #c0392b;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-row label {
+            font-weight: 600;
+            color: #2c3e50;
+            flex: 0 0 120px;
+        }
+
+        .info-row span {
+            color: #555;
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #ecf0f1;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .form-buttons button {
+            flex: 1;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #profileEditForm, #passwordForm {
+            margin-top: 15px;
+        }
+
+        .profile-info-section p {
+            color: #7f8c8d;
+            margin: 0 0 15px 0;
+            line-height: 1.5;
+        }
+
+        .btn.btn-primary {
+            background: #3498db;
+            color: white;
+            border: none;
+        }
+
+        .btn.btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .btn.btn-secondary {
+            background: #95a5a6;
+            color: white;
+            border: none;
+        }
+
+        .btn.btn-secondary:hover {
+            background: #7f8c8d;
+        }
+
+        .btn.btn-danger {
+            background: #e74c3c;
+            color: white;
+            border: none;
+        }
+
+        .btn.btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn.btn-large {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 1rem;
+        }
+
+        #message {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #message p {
+            padding: 15px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        #message p.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        #message p.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .profile-wrapper {
+                grid-template-columns: 1fr;
+                padding: 20px;
+                gap: 25px;
+            }
+
+            .profile-pic-container {
+                width: 120px;
+                height: 120px;
+            }
+
+            .profile-pic-icon-large {
+                font-size: 3rem;
+            }
+
+            .profile-page h1 {
+                font-size: 1.8rem;
+                margin-bottom: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>📚 BookStore</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="products.html" class="nav-link">Products</a>
+                <a href="cart.html" class="nav-link" id="cartLink">Cart <span id="cartCount">0</span></a>
+                <a href="orders.html" class="nav-link" id="ordersLink" style="display: none;">Orders</a>
+                <div id="authButtons">
+                    <a href="login.html" class="nav-link">Login</a>
+                    <a href="register.html" class="btn btn-primary btn-small">Register</a>
+                </div>
+                <div id="userMenu" style="display: none;">
+                    <a href="profile.html" class="profile-nav-link">
+                        <img id="navProfileImage" src="" alt="Profile" class="nav-profile-pic">
+                        <span id="navProfileIcon" class="nav-profile-icon">👤</span>
+                    </a>
+                    <button id="adminBtn" class="btn btn-small" style="display: none; background-color: #3498db; color: white; border: none;">Admin</button>
+                    <button onclick="logout()" class="btn btn-primary btn-small" style="margin-left: auto;">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="profile-page">
+            <h1>My Profile</h1>
+            
+            <div class="profile-wrapper">
+                <!-- Left: Profile Picture -->
+                <div class="profile-left">
+                    <div class="profile-pic-container">
+                        <img id="profilePicture" alt="Profile Picture" class="profile-pic-large">
+                        <span id="profilePictureIcon" class="profile-pic-icon-large">👤</span>
+                    </div>
+                    <div class="profile-pic-upload">
+                        <input type="file" id="profileImageInput" accept="image/*">
+                        <label for="profileImageInput">Change Photo</label>
+                        <p class="upload-note">JPG, PNG • Max 2MB</p>
+                    </div>
+                </div>
+
+                <!-- Right: Account Info -->
+                <div class="profile-right">
+                    <div class="profile-info-section">
+                        <h3>👤 Account Information</h3>
+                        
+                        <div id="profileInfoDisplay">
+                            <div class="info-row">
+                                <label>Name:</label>
+                                <span id="displayName">Loading...</span>
+                            </div>
+                            <div class="info-row">
+                                <label>Email:</label>
+                                <span id="displayEmail">Loading...</span>
+                            </div>
+                            <div class="info-row">
+                                <label>Member Since:</label>
+                                <span id="displayDate">Loading...</span>
+                            </div>
+                            <button onclick="toggleEditMode()" class="btn btn-primary btn-large" style="margin-top: 15px;">Edit Information</button>
+                        </div>
+
+                        <form id="profileEditForm" style="display: none;" onsubmit="handleUpdateProfile(event)">
+                            <div class="form-group">
+                                <label>Name:</label>
+                                <input type="text" id="editName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email:</label>
+                                <input type="email" id="editEmail" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Current Password (Required):</label>
+                                <input type="password" id="currentPassword" required>
+                            </div>
+                            <div class="form-buttons">
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                                <button type="button" onclick="toggleEditMode()" class="btn btn-secondary">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="profile-info-section">
+                        <h3>🔒 Security</h3>
+                        <button onclick="togglePasswordForm()" class="btn btn-primary btn-large">Change Password</button>
+                        
+                        <form id="passwordForm" style="display: none;" onsubmit="handleChangePassword(event)">
+                            <div class="form-group">
+                                <label>Current Password:</label>
+                                <input type="password" id="oldPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label>New Password:</label>
+                                <input type="password" id="newPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Confirm New Password:</label>
+                                <input type="password" id="confirmNewPassword" required>
+                            </div>
+                            <div class="form-buttons">
+                                <button type="submit" class="btn btn-primary">Update Password</button>
+                                <button type="button" onclick="togglePasswordForm()" class="btn btn-secondary">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="profile-info-section danger">
+                        <h3>⚠️ Danger Zone</h3>
+                        <p>Once you delete your account, all data will be permanently lost.</p>
+                        <button onclick="handleDeleteAccount()" class="btn btn-danger btn-large">Delete Account</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="message"></div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 BookStore. All rights reserved.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadProfile();
+        });
+
+        document.getElementById('profileImageInput').addEventListener('change', handleProfileImageUpload);
+
+        function toggleEditMode() {
+            const display = document.getElementById('profileInfoDisplay');
+            const form = document.getElementById('profileEditForm');
+            
+            if (form.style.display === 'none') {
+                form.style.display = 'block';
+                display.style.display = 'none';
+            } else {
+                form.style.display = 'none';
+                display.style.display = 'block';
+            }
+        }
+
+        function togglePasswordForm() {
+            const form = document.getElementById('passwordForm');
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function loadProfile() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                document.querySelector('.profile-wrapper').innerHTML = '<p>Please login to view profile</p>';
+                return;
+            }
+
+            fetch('http://localhost:5000/api/users/profile', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Failed to load profile');
+                return res.json();
+            })
+            .then(user => {
+                document.getElementById('displayName').textContent = user.name;
+                document.getElementById('displayEmail').textContent = user.email;
+                document.getElementById('editName').value = user.name;
+                document.getElementById('editEmail').value = user.email;
+                const date = new Date(user.created_at).toLocaleDateString();
+                document.getElementById('displayDate').textContent = date;
+
+                // Load profile image
+                fetch('http://localhost:5000/api/users/profile-image', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                })
+                .then(res => {
+                    if (!res.ok) {
+                        console.warn('Profile image not found or error fetching');
+                        return null;
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (data && data.profileImage) {
+                        document.getElementById('profilePicture').src = data.profileImage;
+                        document.getElementById('profilePictureIcon').style.display = 'none';
+                        document.getElementById('profilePicture').style.display = 'block';
+                    } else {
+                        document.getElementById('profilePictureIcon').style.display = 'flex';
+                        document.getElementById('profilePicture').style.display = 'none';
+                    }
+                })
+                .catch(err => {
+                    console.warn('Error loading profile image:', err);
+                    // Show icon if image fails to load
+                    document.getElementById('profilePictureIcon').style.display = 'flex';
+                    document.getElementById('profilePicture').style.display = 'none';
+                });
+            })
+            .catch(err => {
+                console.error('Error loading profile:', err);
+            });
+        }
+
+        function handleProfileImageUpload() {
+            const token = localStorage.getItem('token');
+            const fileInput = document.getElementById('profileImageInput');
+            const file = fileInput.files[0];
+
+            if (!file) return;
+
+            if (file.size > 2 * 1024 * 1024) {
+                showMessage('Image size must be less than 2MB', 'error');
+                return;
+            }
+
+            showMessage('Uploading image...', 'success');
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const imageData = e.target.result;
+
+                fetch('http://localhost:5000/api/users/profile-image', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ imageData })
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error('Upload failed: ' + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('Upload response:', data);
+                    if (data.error) {
+                        showMessage(data.error, 'error');
+                    } else {
+                        showMessage('Profile picture updated successfully! ✓', 'success');
+                        // Update the image display
+                        const imgElement = document.getElementById('profilePicture');
+                        imgElement.src = imageData;
+                        imgElement.style.display = 'block';
+                        imgElement.onload = () => {
+                            document.getElementById('profilePictureIcon').style.display = 'none';
+                        };
+                        loadNavbarProfileImage();
+                        fileInput.value = '';
+                    }
+                })
+                .catch(err => {
+                    console.error('Upload error:', err);
+                    showMessage('Error uploading image: ' + err.message, 'error');
+                });
+            };
+            reader.onerror = () => {
+                showMessage('Error reading file', 'error');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleUpdateProfile(event) {
+            event.preventDefault();
+            const token = localStorage.getItem('token');
+            
+            const name = document.getElementById('editName').value;
+            const email = document.getElementById('editEmail').value;
+            const currentPassword = document.getElementById('currentPassword').value;
+
+            fetch('http://localhost:5000/api/users/profile', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ name, email, currentPassword })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    showMessage(data.error, 'error');
+                } else {
+                    showMessage('Profile updated successfully! ✓', 'success');
+                    toggleEditMode();
+                    loadProfile();
+                    document.getElementById('currentPassword').value = '';
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                showMessage('Error updating profile', 'error');
+            });
+        }
+
+        function handleChangePassword(event) {
+            event.preventDefault();
+            const token = localStorage.getItem('token');
+            
+            const oldPassword = document.getElementById('oldPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+            if (newPassword !== confirmNewPassword) {
+                showMessage('Passwords do not match', 'error');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showMessage('Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            fetch('http://localhost:5000/api/users/change-password', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ oldPassword, newPassword })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    showMessage(data.error, 'error');
+                } else {
+                    showMessage('Password changed successfully! ✓', 'success');
+                    togglePasswordForm();
+                    event.target.reset();
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                showMessage('Error changing password', 'error');
+            });
+        }
+
+        function handleDeleteAccount() {
+            if (!confirm('Are you sure you want to delete your account? This cannot be undone!')) return;
+            if (!confirm('This will delete all your data. Are you really sure?')) return;
+
+            const token = localStorage.getItem('token');
+            
+            fetch('http://localhost:5000/api/users/profile', {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert('Account deleted successfully');
+                    logout();
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('Error deleting account');
+            });
+        }
+
+        function showMessage(msg, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<p class="${type}">${msg}</p>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 4000);
+        }
+    </script>
+</body>
+</html>

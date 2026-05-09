@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - BookStore</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>📚 BookStore</h1>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="products.html" class="nav-link">Products</a>
+                <a href="cart.html" class="nav-link" id="cartLink">Cart <span id="cartCount">0</span></a>
+                <a href="orders.html" class="nav-link" id="ordersLink" style="display: none;">Orders</a>
+                <div id="authButtons">
+                    <a href="login.html" class="nav-link">Login</a>
+                    <a href="register.html" class="btn btn-primary btn-small">Register</a>
+                </div>
+                <div id="userMenu" style="display: none;">
+                    <a href="profile.html" class="profile-nav-link">
+                        <img id="navProfileImage" src="" alt="Profile" class="nav-profile-pic">
+                        <span id="navProfileIcon" class="nav-profile-icon">👤</span>
+                    </a>
+                    <button id="adminBtn" class="btn btn-small" style="display: none; background-color: #3498db; color: white; border: none;">Admin</button>
+                    <button onclick="logout()" class="btn btn-primary btn-small" style="margin-left: auto;">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h2>My Orders</h2>
+        <div id="ordersList">
+            <!-- Orders will be loaded here -->
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 BookStore. All rights reserved.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadOrders();
+        });
+
+        function loadOrders() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                document.getElementById('ordersList').innerHTML = '<p>Please login to view orders</p>';
+                return;
+            }
+
+            fetch('http://localhost:5000/api/orders', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(orders => {
+                const container = document.getElementById('ordersList');
+                if (orders.length === 0) {
+                    container.innerHTML = '<p>You have no orders yet</p>';
+                    return;
+                }
+
+                container.innerHTML = orders.map(order => `
+                    <div class="order-card">
+                        <h3>Order #${order.id}</h3>
+                        <p>Date: ${new Date(order.created_at).toLocaleDateString()}</p>
+                        <p>Total: $${order.total_price}</p>
+                        <p>Status: <span class="status ${order.status}">${order.status}</span></p>
+                    </div>
+                `).join('');
+            });
+        }
+    </script>
+</body>
+</html>
