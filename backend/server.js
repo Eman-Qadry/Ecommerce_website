@@ -565,6 +565,11 @@ app.get('/api/admin/products', verifyToken, (req, res) => {
   });
 });
 
+// Serve frontend for all non-API routes (SPA support)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/index.html'));
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
