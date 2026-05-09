@@ -70,7 +70,7 @@
         });
 
         function loadProducts() {
-            fetch('http://localhost:5000/api/products')
+            fetch(`${API_URL}/api/products`)
                 .then(res => res.json())
                 .then(products => {
                     const container = document.getElementById('productsList');
@@ -92,7 +92,7 @@
         function applyFilters() {
             const search = document.getElementById('searchInput').value;
             const category = document.getElementById('categoryFilter').value;
-            let url = `http://localhost:5000/api/products`;
+            let url = `${API_URL}/api/products`;
             const params = [];
             if (search) params.push(`search=${encodeURIComponent(search)}`);
             if (category) params.push(`category=${encodeURIComponent(category)}`);

@@ -62,7 +62,7 @@
         });
 
         function loadFeaturedProducts() {
-            fetch('http://localhost:5000/api/products?search=')
+            fetch(`${API_URL}/api/products?search=`)
                 .then(res => res.json())
                 .then(products => {
                     const featured = products.slice(0, 6);

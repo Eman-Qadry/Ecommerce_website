@@ -74,7 +74,7 @@
         });
 
         function loadProductDetails() {
-            fetch(`http://localhost:5000/api/products/${productId}`)
+            fetch(`${API_URL}/api/products/${productId}`)
                 .then(res => res.json())
                 .then(product => {
                     document.getElementById('productImage').src = product.image_url;
@@ -106,7 +106,7 @@
                 return;
             }
 
-            fetch('http://localhost:5000/api/cart', {
+            fetch(`${API_URL}/api/cart`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

@@ -1,6 +1,9 @@
 // Authentication & Cart Functions
 
-const API_URL = 'http://localhost:5000';
+// Determine API URL based on environment
+const API_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:5000' 
+    : window.location.origin;
 
 // Check if user is logged in and update navbar
 function checkAuth() {
