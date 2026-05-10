@@ -106,9 +106,9 @@
                             </div>
                             <div class="cart-item-controls">
                                 <input type="number" value="${item.quantity}" min="1" 
-                                    onchange="updateQuantity(${item.id}, this.value)" class="quantity-input">
+                                    onchange="updateQuantity(${item.cart_id}, this.value)" class="quantity-input">
                                 <p>$${itemTotal.toFixed(2)}</p>
-                                <button onclick="removeFromCart(${item.id})" class="btn btn-danger">Remove</button>
+                                <button onclick="removeFromCart(${item.cart_id})" class="btn btn-danger">Remove</button>
                             </div>
                         </div>
                     `;
