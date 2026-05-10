@@ -2,25 +2,34 @@
 
 ### 🚀 Getting Started (5 minutes)
 
+**Step 0: Database Setup** ⚠️ NEW!
+1. Read [DATABASE_SETUP.md](DATABASE_SETUP.md) for PostgreSQL configuration
+2. Create `.env` file in `backend/` folder (copy from `.env.example`)
+3. Add your PostgreSQL connection string to `.env`
+
 **Step 1: Backend Setup**
 1. Open PowerShell/Terminal
 2. Navigate to: `d:\Ecommerce_website\backend`
 3. Run: `npm install`
-4. Run: `node server.js`
-5. You should see: "Server running on http://localhost:5000"
+4. Run: `npm start`
+5. You should see: "Connected to PostgreSQL database" and "Server running on http://localhost:5000"
 
 **Step 2: Frontend Access**
 1. Open your browser
-2. Go to: `file:///d:/Ecommerce_website/frontend/index.html`
+2. Go to: `http://localhost:5000` (the backend now serves the frontend)
    
-   OR if you have Python installed:
+   OR if you want to run frontend separately:
    - Open PowerShell in: `d:\Ecommerce_website\frontend`
    - Run: `python -m http.server 8000`
    - Visit: `http://localhost:8000`
 
 **Step 3: Test the System**
 
-1. **Register a User Account:**
+1. **Login with Admin Account:**
+   - Email: `admin@bookstore.com`
+   - Password: `admin123`
+   
+   OR **Register a New User Account:**
    - Click "Register"
    - Fill in: Name, Email, Password
    - Submit
@@ -43,10 +52,9 @@
 5. **View Orders:**
    - Click "Orders" to see purchase history
 
-6. **Try Admin Panel:**
-   - Login with your account
-   - The admin panel would normally be accessible for admin users
-   - For testing, modify `backend/server.js` line 56 to add a test admin
+6. **Admin Features:**
+   - When logged in as admin, you'll have access to admin panel
+   - Manage products, view all orders, etc.
 
 ---
 
