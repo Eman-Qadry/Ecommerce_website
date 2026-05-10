@@ -1,129 +1,196 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Products - BookStore</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
     <nav class="navbar">
-        <div class="container">
-            <div class="nav-brand">
-                <h1>📚 BookStore</h1>
-            </div>
-            <div class="nav-links">
-                <a href="index.html" class="nav-link">Home</a>
-                <a href="products.html" class="nav-link">Products</a>
-                <a href="cart.html" class="nav-link" id="cartLink">Cart <span id="cartCount">0</span></a>
-                <a href="orders.html" class="nav-link" id="ordersLink" style="display: none;">Orders</a>
-                <div id="authButtons">
-                    <a href="login.html" class="nav-link">Login</a>
-                    <a href="register.html" class="btn btn-primary btn-small">Register</a>
-                </div>
-                <div id="userMenu" style="display: none;">
-                    <a href="profile.html" class="profile-nav-link">
-                        <img id="navProfileImage" src="" alt="Profile" class="nav-profile-pic">
-                        <span id="navProfileIcon" class="nav-profile-icon">👤</span>
-                    </a>
-                    <button id="adminBtn" class="btn btn-small" style="display: none; background-color: #3498db; color: white; border: none;">Admin</button>
-                    <button onclick="logout()" class="btn btn-primary btn-small" style="margin-left: auto;">Logout</button>
-                </div>
-            </div>
+      <div class="container">
+        <div class="nav-brand">
+          <h1>📚 BookStore</h1>
         </div>
+        <div class="nav-links">
+          <a href="index.html" class="nav-link">Home</a>
+          <a href="products.html" class="nav-link">Products</a>
+          <a href="cart.html" class="nav-link" id="cartLink"
+            >Cart <span id="cartCount">0</span></a
+          >
+          <a
+            href="orders.html"
+            class="nav-link"
+            id="ordersLink"
+            style="display: none"
+            >Orders</a
+          >
+          <div id="authButtons">
+            <a href="login.html" class="nav-link">Login</a>
+            <a href="register.html" class="btn btn-primary btn-small"
+              >Register</a
+            >
+          </div>
+          <div id="userMenu" style="display: none">
+            <a href="profile.html" class="profile-nav-link">
+              <img
+                id="navProfileImage"
+                src=""
+                alt="Profile"
+                class="nav-profile-pic"
+              />
+              <span id="navProfileIcon" class="nav-profile-icon">👤</span>
+            </a>
+            <button
+              id="adminBtn"
+              class="btn btn-small"
+              style="
+                display: none;
+                background-color: #3498db;
+                color: white;
+                border: none;
+              "
+            >
+              Admin
+            </button>
+            <button
+              onclick="logout()"
+              class="btn btn-primary btn-small"
+              style="margin-left: auto"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
     </nav>
 
     <div class="container">
-        <div class="products-page">
-            <div class="filters">
-                <h3>Search & Filter</h3>
-                <input type="text" id="searchInput" placeholder="Search books..." class="search-box">
-                <select id="categoryFilter" class="filter-select">
-                    <option value="">All Categories</option>
-                    <option value="Fiction">Fiction</option>
-                    <option value="Romance">Romance</option>
-                    <option value="Non-fiction">Non-fiction</option>
-                    <option value="Mystery">Mystery</option>
-                    <option value="Science Fiction">Science Fiction</option>
-                </select>
-                <button onclick="applyFilters()" class="btn btn-primary">Search</button>
-            </div>
-
-            <div class="products-container">
-                <h2>All Books</h2>
-                <div id="productsList" class="products-grid">
-                    <!-- Products will be loaded here -->
-                </div>
-            </div>
+      <div class="products-page">
+        <div class="filters">
+          <h3>Search & Filter</h3>
+          <input
+            type="text"
+            id="searchInput"
+            placeholder="Search books..."
+            class="search-box"
+          />
+          <select id="categoryFilter" class="filter-select">
+            <option value="">All Categories</option>
+          </select>
+          <button onclick="applyFilters()" class="btn btn-primary">
+            Search
+          </button>
         </div>
+
+        <div class="products-container">
+          <h2>All Books</h2>
+          <div id="productsList" class="products-grid">
+            <!-- Products will be loaded here -->
+          </div>
+        </div>
+      </div>
     </div>
 
     <footer class="footer">
-        <p>&copy; 2024 BookStore. All rights reserved.</p>
+      <p>&copy; 2024 BookStore. All rights reserved.</p>
     </footer>
 
     <script src="js/app.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            checkAuth();
-            loadProducts();
-        });
+      document.addEventListener("DOMContentLoaded", () => {
+        checkAuth();
+        loadCategories();
+        loadProducts();
+      });
 
-        function loadProducts() {
-            fetch(`${API_URL}/api/products`)
-                .then(res => res.json())
-                .then(products => {
-                    const container = document.getElementById('productsList');
-                    container.innerHTML = products.map(product => `
+      function loadCategories() {
+        fetch(`${API_URL}/api/categories`)
+          .then((res) => res.json())
+          .then((categories) => {
+            const categorySelect = document.getElementById("categoryFilter");
+
+            categorySelect.innerHTML = `
+                <option value="">All Categories</option>
+            `;
+
+            categories.forEach((item) => {
+              categorySelect.innerHTML += `
+                    <option value="${item.category}">
+                        ${item.category}
+                    </option>
+                `;
+            });
+          })
+          .catch((err) => console.error("Error loading categories:", err));
+      }
+      function loadProducts() {
+        fetch(`${API_URL}/api/products`)
+          .then((res) => res.json())
+          .then((products) => {
+            const container = document.getElementById("productsList");
+            container.innerHTML = products
+              .map(
+                (product) => `
                         <div class="product-card">
                             <img src="${product.image_url}" alt="${product.title}">
                             <h4>${product.title}</h4>
                             <p class="author">by ${product.author}</p>
                             <p class="price">$${product.price}</p>
-                            <p class="stock ${product.stock > 0 ? 'in-stock' : 'out-stock'}">
-                                ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                            <p class="stock ${product.stock > 0 ? "in-stock" : "out-stock"}">
+                                ${product.stock > 0 ? "In Stock" : "Out of Stock"}
                             </p>
                             <button onclick="viewProduct(${product.id})" class="btn btn-primary">View</button>
                         </div>
-                    `).join('');
-                });
-        }
+                    `,
+              )
+              .join("");
+          });
+      }
 
-        function applyFilters() {
-            const search = document.getElementById('searchInput').value;
-            const category = document.getElementById('categoryFilter').value;
-            let url = `${API_URL}/api/products`;
-            const params = [];
-            if (search) params.push(`search=${encodeURIComponent(search)}`);
-            if (category) params.push(`category=${encodeURIComponent(category)}`);
-            if (params.length) url += '?' + params.join('&');
+      function applyFilters() {
+        const search = document.getElementById("searchInput").value;
+        const category = document.getElementById("categoryFilter").value;
+        let url = `${API_URL}/api/products`;
+        const params = [];
+        if (search) params.push(`search=${encodeURIComponent(search)}`);
+        if (category) params.push(`category=${encodeURIComponent(category)}`);
+        if (params.length) url += "?" + params.join("&");
 
-            fetch(url)
-                .then(res => res.json())
-                .then(products => {
-                    const container = document.getElementById('productsList');
-                    container.innerHTML = products.length ? products.map(product => `
+        fetch(url)
+          .then((res) => res.json())
+          .then((products) => {
+            const container = document.getElementById("productsList");
+            container.innerHTML = products.length
+              ? products
+                  .map(
+                    (product) => `
                         <div class="product-card">
                             <img src="${product.image_url}" alt="${product.title}">
                             <h4>${product.title}</h4>
                             <p class="author">by ${product.author}</p>
                             <p class="price">$${product.price}</p>
-                            <p class="stock ${product.stock > 0 ? 'in-stock' : 'out-stock'}">
-                                ${product.stock > 0 ? 'In Stock' : 'Out of Stock'}
+                            <p class="stock ${product.stock > 0 ? "in-stock" : "out-stock"}">
+                                ${product.stock > 0 ? "In Stock" : "Out of Stock"}
                             </p>
                             <button onclick="viewProduct(${product.id})" class="btn btn-primary">View</button>
                         </div>
-                    `).join('') : '<p>No books found</p>';
-                });
-        }
+                    `,
+                  )
+                  .join("")
+              : "<p>No books found</p>";
+          });
+      }
 
-        function viewProduct(id) {
-            window.location.href = `product.html?id=${id}`;
-        }
+      function viewProduct(id) {
+        window.location.href = `product.html?id=${id}`;
+      }
 
-        document.getElementById('searchInput').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') applyFilters();
+      document
+        .getElementById("searchInput")
+        .addEventListener("keypress", (e) => {
+          if (e.key === "Enter") applyFilters();
         });
     </script>
-</body>
+  </body>
 </html>

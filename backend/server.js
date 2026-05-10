@@ -481,7 +481,20 @@ app.get('/api/products/:id', (req, res) => {
     res.json(product);
   });
 });
+ // GET ALL CATEGORIES
+app.get('/api/categories', (req, res) => {
+  db.all(
+    'SELECT DISTINCT category FROM products WHERE category IS NOT NULL ORDER BY category ASC',
+    [],
+    (err, categories) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
 
+      res.json(categories);
+    }
+  );
+});
 // CART ROUTES
 app.get('/api/cart', verifyToken, (req, res) => {
   db.all(
