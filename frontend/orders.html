@@ -40,6 +40,16 @@
         </div>
     </div>
 
+    <!-- Order Details Modal -->
+    <div id="orderModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeOrderModal()">&times;</span>
+            <div id="orderDetails">
+                <!-- Order details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
     <footer class="footer">
         <p>&copy; 2024 BookStore. All rights reserved.</p>
     </footer>
@@ -71,13 +81,133 @@
 
                 container.innerHTML = orders.map(order => `
                     <div class="order-card">
-                        <h3>Order #${order.id}</h3>
-                        <p>Date: ${new Date(order.created_at).toLocaleDateString()}</p>
-                        <p>Total: $${order.total_price}</p>
-                        <p>Status: <span class="status ${order.status}">${order.status}</span></p>
+                        <div class="order-header">
+                            <div class="order-info">
+                                <h3>Order #${order.id}</h3>
+                                <p>Date: ${new Date(order.created_at).toLocaleDateString()}</p>
+                            </div>
+                            <div class="order-status">
+                                <span class="status status-${order.status}">${order.status.toUpperCase()}</span>
+                            </div>
+                        </div>
+                        <div class="order-details">
+                            <p><strong>Total:</strong> $${parseFloat(order.total_price).toFixed(2)}</p>
+                            <p><strong>Recipient:</strong> ${order.full_name}</p>
+                            <p><strong>Address:</strong> ${order.address}, ${order.city}, ${order.postal_code}, ${order.country}</p>
+                        </div>
+                        <div class="order-actions">
+                            <button onclick="viewOrderDetails(${order.id})" class="btn btn-primary">View Details</button>
+                            ${order.status === 'pending' ? `<button onclick="cancelOrder(${order.id})" class="btn btn-danger">Cancel Order</button>` : ''}
+                        </div>
                     </div>
                 `).join('');
+            })
+            .catch(err => {
+                console.error('Error loading orders:', err);
+                document.getElementById('ordersList').innerHTML = '<p>Error loading orders</p>';
             });
+        }
+
+        function viewOrderDetails(orderId) {
+            const token = localStorage.getItem('token');
+
+            fetch(`${API_URL}/api/orders/${orderId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(order => {
+                const detailsDiv = document.getElementById('orderDetails');
+                const itemsHTML = order.items.map(item => `
+                    <div class="modal-item">
+                        <img src="${item.image_url}" alt="${item.title}">
+                        <div>
+                            <h4>${item.title}</h4>
+                            <p>${item.author}</p>
+                            <p>Quantity: ${item.quantity} x $${parseFloat(item.price).toFixed(2)} = $${(item.quantity * parseFloat(item.price)).toFixed(2)}</p>
+                        </div>
+                    </div>
+                `).join('');
+
+                detailsDiv.innerHTML = `
+                    <h3>Order #${order.id}</h3>
+                    <div class="order-detail-info">
+                        <div class="detail-section">
+                            <h4>Status</h4>
+                            <p><span class="status status-${order.status}">${order.status.toUpperCase()}</span></p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Delivery Information</h4>
+                            <p><strong>Name:</strong> ${order.full_name}</p>
+                            <p><strong>Phone:</strong> ${order.phone}</p>
+                            <p><strong>Address:</strong> ${order.address}</p>
+                            <p><strong>City:</strong> ${order.city}</p>
+                            <p><strong>Postal Code:</strong> ${order.postal_code}</p>
+                            <p><strong>Country:</strong> ${order.country}</p>
+                            ${order.notes ? `<p><strong>Notes:</strong> ${order.notes}</p>` : ''}
+                        </div>
+                    </div>
+                    <h4>Items Ordered</h4>
+                    <div class="modal-items">
+                        ${itemsHTML}
+                    </div>
+                    <div class="order-summary">
+                        <p><strong>Total:</strong> $${parseFloat(order.total_price).toFixed(2)}</p>
+                        <p><strong>Order Date:</strong> ${new Date(order.created_at).toLocaleString()}</p>
+                    </div>
+                    <div class="modal-actions">
+                        <button onclick="closeOrderModal()" class="btn btn-secondary">Close</button>
+                        ${order.status === 'pending' ? `<button onclick="cancelOrder(${order.id})" class="btn btn-danger">Cancel Order</button>` : ''}
+                    </div>
+                `;
+
+                document.getElementById('orderModal').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            })
+            .catch(err => {
+                console.error('Error loading order details:', err);
+                alert('Error loading order details');
+            });
+        }
+
+        function closeOrderModal() {
+            document.getElementById('orderModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function cancelOrder(orderId) {
+            const token = localStorage.getItem('token');
+
+            if (confirm('Are you sure you want to cancel this order?')) {
+                fetch(`${API_URL}/api/orders/${orderId}/cancel`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        alert('Order cancelled successfully');
+                        closeOrderModal();
+                        loadOrders();
+                    }
+                })
+                .catch(err => {
+                    console.error('Error cancelling order:', err);
+                    alert('Error cancelling order');
+                });
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('orderModal');
+            if (event.target == modal) {
+                closeOrderModal();
+            }
         }
     </script>
 </body>

@@ -14,7 +14,7 @@
             </div>
             <div class="nav-links">
                 <a href="index.html" class="nav-link">Store</a>
-                <a href="admin.html" class="nav-link">Manage Products</a>
+                <a href="admin.html" class="nav-link">Admin Panel</a>
                 <button onclick="logout()" class="btn btn-small">Logout</button>
             </div>
         </div>
@@ -22,60 +22,111 @@
 
     <div class="container">
         <div class="admin-panel">
-            <h2>Manage Inventory</h2>
-            
-            <div class="admin-section">
-                <h3>Add New Book</h3>
-                <form onsubmit="handleAddProduct(event)">
-                    <div class="form-group">
-                        <label>Title:</label>
-                        <input type="text" id="title" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Author:</label>
-                        <input type="text" id="author" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Price:</label>
-                        <input type="number" id="price" step="0.01" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Stock:</label>
-                        <input type="number" id="stock" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Category:</label>
-                        <input type="text" id="category" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Description:</label>
-                        <textarea id="description"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Image URL:</label>
-                        <input type="text" id="image_url" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Add Product</button>
-                </form>
+            <!-- Tab Navigation -->
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="switchTab('products')">Manage Products</button>
+                <button class="tab-btn" onclick="switchTab('orders')">Manage Orders</button>
             </div>
 
-            <div class="admin-section">
-                <h3>Current Products</h3>
-                <table class="products-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Title</th>
-                            <th>Author</th>
-                            <th>Price</th>
-                            <th>Stock</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="productsTable">
-                        <!-- Products will be loaded here -->
-                    </tbody>
-                </table>
+            <!-- Products Tab -->
+            <div id="productsTab" class="tab-content active">
+                <h2>Manage Inventory</h2>
+            
+                <div class="admin-section">
+                    <h3>Add New Book</h3>
+                    <form onsubmit="handleAddProduct(event)">
+                        <div class="form-group">
+                            <label>Title:</label>
+                            <input type="text" id="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Author:</label>
+                            <input type="text" id="author" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Price:</label>
+                            <input type="number" id="price" step="0.01" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Stock:</label>
+                            <input type="number" id="stock" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Category:</label>
+                            <input type="text" id="category" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Description:</label>
+                            <textarea id="description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Image URL:</label>
+                            <input type="text" id="image_url" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Product</button>
+                    </form>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Current Products</h3>
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTable">
+                            <!-- Products will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Orders Tab -->
+            <div id="ordersTab" class="tab-content">
+                <h2>Manage Orders</h2>
+                <div class="admin-section">
+                    <div class="orders-filter">
+                        <select id="statusFilter" onchange="loadAdminOrders()">
+                            <option value="">All Orders</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="delivered">Delivered</option>
+                        </select>
+                    </div>
+                    <table class="orders-table">
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Email</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTable">
+                            <!-- Orders will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Order Details Modal -->
+            <div id="orderDetailsModal" class="modal">
+                <div class="modal-content">
+                    <span class="close" onclick="closeOrderDetailsModal()">&times;</span>
+                    <div id="orderDetailsContent">
+                        <!-- Order details will be loaded here -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -97,7 +148,32 @@
             }
 
             loadAdminProducts();
+            loadAdminOrders();
         });
+
+        // Tab switching functionality
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName + 'Tab').classList.add('active');
+
+            // Add active class to clicked button
+            event.target.classList.add('active');
+
+            // Reload data for the tab
+            if (tabName === 'orders') {
+                loadAdminOrders();
+            }
+        }
 
         function loadAdminProducts() {
             const token = localStorage.getItem('token');
@@ -121,6 +197,163 @@
                     </tr>
                 `).join('');
             });
+        }
+
+        // Order Management Functions
+        function loadAdminOrders() {
+            const token = localStorage.getItem('token');
+            const statusFilter = document.getElementById('statusFilter')?.value || '';
+
+            fetch(`${API_URL}/api/admin/orders`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(orders => {
+                // Filter by status if selected
+                let filteredOrders = orders;
+                if (statusFilter) {
+                    filteredOrders = orders.filter(order => order.status === statusFilter);
+                }
+
+                const tbody = document.getElementById('ordersTable');
+                if (filteredOrders.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No orders found</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = filteredOrders.map(order => `
+                    <tr>
+                        <td>#${order.id}</td>
+                        <td>${order.user_name}</td>
+                        <td>${order.email}</td>
+                        <td>$${parseFloat(order.total_price).toFixed(2)}</td>
+                        <td><span class="status status-${order.status}">${order.status.toUpperCase()}</span></td>
+                        <td>${new Date(order.created_at).toLocaleDateString()}</td>
+                        <td>
+                            <button onclick="viewOrderDetails(${order.id})" class="btn btn-small">View</button>
+                            ${order.status === 'pending' ? `<button onclick="approveOrder(${order.id})" class="btn btn-small" style="background-color: #27ae60; color: white;">Approve</button>` : ''}
+                            ${order.status !== 'cancelled' ? `<button onclick="cancelOrderAdmin(${order.id})" class="btn btn-danger btn-small">Cancel</button>` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            })
+            .catch(err => {
+                console.error('Error loading orders:', err);
+            });
+        }
+
+        function viewOrderDetails(orderId) {
+            const token = localStorage.getItem('token');
+
+            fetch(`${API_URL}/api/admin/orders/${orderId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(order => {
+                const itemsHTML = order.items.map(item => `
+                    <div class="modal-item">
+                        <img src="${item.image_url}" alt="${item.title}">
+                        <div>
+                            <h4>${item.title}</h4>
+                            <p>${item.author}</p>
+                            <p>Quantity: ${item.quantity} x $${parseFloat(item.price).toFixed(2)} = $${(item.quantity * parseFloat(item.price)).toFixed(2)}</p>
+                        </div>
+                    </div>
+                `).join('');
+
+                const statusOptions = ['pending', 'approved', 'delivered', 'cancelled'];
+                const statusSelect = statusOptions.map(s => 
+                    `<option value="${s}" ${s === order.status ? 'selected' : ''}>${s.toUpperCase()}</option>`
+                ).join('');
+
+                const detailsHTML = `
+                    <h3>Order #${order.id}</h3>
+                    <div class="order-detail-info">
+                        <div class="detail-section">
+                            <h4>Order Status</h4>
+                            <select id="statusSelect" onchange="updateOrderStatus(${order.id}, this.value)">
+                                ${statusSelect}
+                            </select>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Customer Information</h4>
+                            <p><strong>Name:</strong> ${order.user_name}</p>
+                            <p><strong>Email:</strong> ${order.email}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="order-detail-info">
+                        <div class="detail-section">
+                            <h4>Delivery Address</h4>
+                            <p><strong>Name:</strong> ${order.full_name}</p>
+                            <p><strong>Phone:</strong> ${order.phone}</p>
+                            <p><strong>Address:</strong> ${order.address}</p>
+                            <p><strong>City:</strong> ${order.city}</p>
+                            <p><strong>Postal Code:</strong> ${order.postal_code}</p>
+                            <p><strong>Country:</strong> ${order.country}</p>
+                            ${order.notes ? `<p><strong>Notes:</strong> ${order.notes}</p>` : ''}
+                        </div>
+                    </div>
+
+                    <h4>Items Ordered</h4>
+                    <div class="modal-items">
+                        ${itemsHTML}
+                    </div>
+                    <div class="order-summary">
+                        <p><strong>Total:</strong> $${parseFloat(order.total_price).toFixed(2)}</p>
+                        <p><strong>Order Date:</strong> ${new Date(order.created_at).toLocaleString()}</p>
+                    </div>
+                    <div class="modal-actions">
+                        <button onclick="closeOrderDetailsModal()" class="btn btn-secondary">Close</button>
+                    </div>
+                `;
+
+                document.getElementById('orderDetailsContent').innerHTML = detailsHTML;
+                document.getElementById('orderDetailsModal').style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            })
+            .catch(err => {
+                console.error('Error loading order details:', err);
+                alert('Error loading order details');
+            });
+        }
+
+        function closeOrderDetailsModal() {
+            document.getElementById('orderDetailsModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function updateOrderStatus(orderId, status) {
+            const token = localStorage.getItem('token');
+
+            fetch(`${API_URL}/api/admin/orders/${orderId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ status })
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('Order status updated successfully');
+                closeOrderDetailsModal();
+                loadAdminOrders();
+            })
+            .catch(err => {
+                console.error('Error updating status:', err);
+                alert('Error updating order status');
+            });
+        }
+
+        function approveOrder(orderId) {
+            updateOrderStatus(orderId, 'approved');
+        }
+
+        function cancelOrderAdmin(orderId) {
+            if (confirm('Are you sure you want to cancel this order?')) {
+                updateOrderStatus(orderId, 'cancelled');
+            }
         }
 
         function handleAddProduct(event) {
@@ -182,6 +415,14 @@
 
         function editProduct(id) {
             alert('Edit functionality can be added - currently delete and re-add to modify');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('orderDetailsModal');
+            if (event.target == modal) {
+                closeOrderDetailsModal();
+            }
         }
     </script>
 </body>

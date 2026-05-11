@@ -616,6 +616,336 @@ body {
     margin-top: 1rem;
 }
 
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 2rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+}
+
+/* Checkout Form Styles */
+#checkoutForm .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+#checkoutForm .form-group {
+    margin-bottom: 1.5rem;
+}
+
+#checkoutForm label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+}
+
+#checkoutForm input,
+#checkoutForm textarea {
+    width: 100%;
+    padding: 0.7rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+#checkoutForm textarea {
+    resize: vertical;
+}
+
+.form-group button {
+    margin-right: 0.5rem;
+}
+
+/* Order Card Enhancements */
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #eee;
+}
+
+.order-info {
+    flex: 1;
+}
+
+.order-status {
+    text-align: right;
+}
+
+.order-details {
+    background-color: #f9f9f9;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+.order-details p {
+    margin: 0.5rem 0;
+}
+
+.order-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.order-actions button {
+    flex: 1;
+}
+
+/* Order Modal Styles */
+.order-detail-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+    background-color: #f9f9f9;
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+.detail-section h4 {
+    margin-top: 0;
+    color: #2c3e50;
+    font-size: 0.95rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.detail-section p {
+    margin: 0.3rem 0;
+    font-size: 0.9rem;
+}
+
+.modal-items {
+    margin: 1rem 0;
+}
+
+.modal-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+}
+
+.modal-item img {
+    width: 60px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.modal-item div {
+    flex: 1;
+}
+
+.modal-item h4 {
+    margin: 0 0 0.3rem 0;
+}
+
+.modal-item p {
+    margin: 0.2rem 0;
+    font-size: 0.9rem;
+}
+
+.order-summary {
+    background-color: #ecf0f1;
+    padding: 1rem;
+    border-radius: 4px;
+    margin: 1rem 0;
+    text-align: right;
+}
+
+.order-summary p {
+    margin: 0.5rem 0;
+    font-weight: 500;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    justify-content: flex-end;
+}
+
+.modal-actions button {
+    min-width: 100px;
+}
+
+/* Status Badges */
+.status-pending {
+    background-color: #f39c12 !important;
+    color: white !important;
+}
+
+.status-approved {
+    background-color: #3498db !important;
+    color: white !important;
+}
+
+.status-delivered {
+    background-color: #2ecc71 !important;
+    color: white !important;
+}
+
+.status-cancelled {
+    background-color: #e74c3c !important;
+    color: white !important;
+}
+
+/* Admin Tabs */
+.admin-tabs {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid #ecf0f1;
+}
+
+.tab-btn {
+    padding: 0.8rem 1.5rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #7f8c8d;
+    transition: all 0.3s;
+}
+
+.tab-btn:hover {
+    color: #2c3e50;
+}
+
+.tab-btn.active {
+    color: #2c3e50;
+    border-bottom-color: #3498db;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Orders Table */
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.orders-table thead {
+    background-color: #2c3e50;
+    color: white;
+}
+
+.orders-table th,
+.orders-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.orders-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.orders-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Orders Filter */
+.orders-filter {
+    margin-bottom: 1.5rem;
+}
+
+.orders-filter select {
+    padding: 0.7rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+/* Products Table */
+.products-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.products-table thead {
+    background-color: #2c3e50;
+    color: white;
+}
+
+.products-table th,
+.products-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #ecf0f1;
+}
+
+.products-table tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.products-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .navbar .container {

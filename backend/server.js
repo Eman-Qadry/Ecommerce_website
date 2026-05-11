@@ -144,6 +144,13 @@ function initializeDatabase() {
             user_id INTEGER NOT NULL,
             total_price DECIMAL(10, 2) NOT NULL,
             status TEXT DEFAULT 'pending',
+            full_name TEXT,
+            phone TEXT,
+            address TEXT,
+            city TEXT,
+            postal_code TEXT,
+            country TEXT,
+            notes TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY(user_id) REFERENCES users(id)
           )
@@ -689,6 +696,12 @@ app.put("/api/cart/:cartId", verifyToken, (req, res) => {
 // ORDER ROUTES
 app.post("/api/orders", verifyToken, (req, res) => {
   const userId = req.user.id;
+  const { fullName, phone, address, city, postalCode, country, notes } = req.body;
+
+  // Validate address fields
+  if (!fullName || !phone || !address || !city || !postalCode || !country) {
+    return res.status(400).json({ error: "Please provide all delivery details" });
+  }
 
   db.get(
     `SELECT SUM(products.price * cart.quantity) as total FROM cart 
@@ -703,8 +716,8 @@ app.post("/api/orders", verifyToken, (req, res) => {
       const totalPrice = result.total;
 
       pool.query(
-        "INSERT INTO orders (user_id, total_price) VALUES ($1, $2) RETURNING id",
-        [userId, totalPrice],
+        "INSERT INTO orders (user_id, total_price, full_name, phone, address, city, postal_code, country, notes, status) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id",
+        [userId, totalPrice, fullName, phone, address, city, postalCode, country, notes || '', 'pending'],
         (err, result) => {
           if (err) return res.status(500).json({ error: "Database error" });
 
@@ -743,6 +756,7 @@ app.post("/api/orders", verifyToken, (req, res) => {
   );
 });
 
+// Get all user orders
 app.get("/api/orders", verifyToken, (req, res) => {
   db.all(
     "SELECT * FROM orders WHERE user_id = $1 ORDER BY created_at DESC",
@@ -750,6 +764,173 @@ app.get("/api/orders", verifyToken, (req, res) => {
     (err, orders) => {
       if (err) return res.status(500).json({ error: "Database error" });
       res.json(orders);
+    },
+  );
+});
+
+// Get order details with items
+app.get("/api/orders/:id", verifyToken, (req, res) => {
+  db.get(
+    "SELECT * FROM orders WHERE id = $1 AND user_id = $2",
+    [req.params.id, req.user.id],
+    (err, order) => {
+      if (err) return res.status(500).json({ error: "Database error" });
+      if (!order) return res.status(404).json({ error: "Order not found" });
+
+      db.all(
+        `SELECT order_items.*, products.title, products.author, products.image_url 
+         FROM order_items 
+         JOIN products ON order_items.product_id = products.id 
+         WHERE order_items.order_id = $1`,
+        [req.params.id],
+        (err, items) => {
+          if (err) return res.status(500).json({ error: "Database error" });
+          order.items = items;
+          res.json(order);
+        },
+      );
+    },
+  );
+});
+
+// Cancel order (user)
+app.put("/api/orders/:id/cancel", verifyToken, (req, res) => {
+  db.get(
+    "SELECT status FROM orders WHERE id = $1 AND user_id = $2",
+    [req.params.id, req.user.id],
+    (err, order) => {
+      if (err) return res.status(500).json({ error: "Database error" });
+      if (!order) return res.status(404).json({ error: "Order not found" });
+
+      if (order.status !== 'pending') {
+        return res.status(400).json({ error: "Can only cancel pending orders" });
+      }
+
+      // Get order items to restore stock
+      db.all(
+        "SELECT product_id, quantity FROM order_items WHERE order_id = $1",
+        [req.params.id],
+        (err, items) => {
+          if (err) return res.status(500).json({ error: "Database error" });
+
+          // Restore stock
+          items.forEach((item) => {
+            db.run("UPDATE products SET stock = stock + $1 WHERE id = $2", [
+              item.quantity,
+              item.product_id,
+            ]);
+          });
+
+          // Update order status
+          db.run(
+            "UPDATE orders SET status = $1 WHERE id = $2",
+            ['cancelled', req.params.id],
+            (err) => {
+              if (err) return res.status(500).json({ error: "Database error" });
+              res.json({ message: "Order cancelled successfully" });
+            },
+          );
+        },
+      );
+    },
+  );
+});
+
+// ADMIN ORDERS ROUTES
+app.get("/api/admin/orders", verifyToken, (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  db.all(
+    `SELECT o.*, u.email, u.name as user_name FROM orders o 
+     JOIN users u ON o.user_id = u.id 
+     ORDER BY o.created_at DESC`,
+    [],
+    (err, orders) => {
+      if (err) return res.status(500).json({ error: "Database error" });
+      res.json(orders);
+    },
+  );
+});
+
+// Get admin view of specific order
+app.get("/api/admin/orders/:id", verifyToken, (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  db.get(
+    `SELECT o.*, u.email, u.name as user_name FROM orders o 
+     JOIN users u ON o.user_id = u.id 
+     WHERE o.id = $1`,
+    [req.params.id],
+    (err, order) => {
+      if (err) return res.status(500).json({ error: "Database error" });
+      if (!order) return res.status(404).json({ error: "Order not found" });
+
+      db.all(
+        `SELECT order_items.*, products.title, products.author, products.image_url 
+         FROM order_items 
+         JOIN products ON order_items.product_id = products.id 
+         WHERE order_items.order_id = $1`,
+        [req.params.id],
+        (err, items) => {
+          if (err) return res.status(500).json({ error: "Database error" });
+          order.items = items;
+          res.json(order);
+        },
+      );
+    },
+  );
+});
+
+// Update order status (admin)
+app.put("/api/admin/orders/:id", verifyToken, (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  const { status } = req.body;
+  const validStatuses = ['pending', 'approved', 'cancelled', 'delivered'];
+
+  if (!status || !validStatuses.includes(status)) {
+    return res.status(400).json({ error: "Invalid status" });
+  }
+
+  db.get(
+    "SELECT status FROM orders WHERE id = $1",
+    [req.params.id],
+    (err, order) => {
+      if (err) return res.status(500).json({ error: "Database error" });
+      if (!order) return res.status(404).json({ error: "Order not found" });
+
+      // If changing to cancelled, restore stock
+      if (status === 'cancelled' && order.status !== 'cancelled') {
+        db.all(
+          "SELECT product_id, quantity FROM order_items WHERE order_id = $1",
+          [req.params.id],
+          (err, items) => {
+            if (err) return res.status(500).json({ error: "Database error" });
+
+            items.forEach((item) => {
+              db.run("UPDATE products SET stock = stock + $1 WHERE id = $2", [
+                item.quantity,
+                item.product_id,
+              ]);
+            });
+          },
+        );
+      }
+
+      db.run(
+        "UPDATE orders SET status = $1 WHERE id = $2",
+        [status, req.params.id],
+        (err) => {
+          if (err) return res.status(500).json({ error: "Database error" });
+          res.json({ message: "Order status updated successfully" });
+        },
+      );
     },
   );
 });
