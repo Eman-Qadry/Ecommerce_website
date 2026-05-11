@@ -182,107 +182,111 @@ function initializeDatabase() {
                       }
                       console.log("✓ Order items table created");
 
-                      // Step 6: Check and seed sample products
-                      console.log("Checking for existing products...");
-                      pool.query(
-                        "SELECT COUNT(*) as count FROM products",
-                        (err, result) => {
-                          if (err) {
-                            console.error("Error checking products:", err);
-                            return;
-                          }
+                      // Step 6: Run migrations to add missing columns
+                      console.log("Running database migrations...");
+                      runMigrations(() => {
+                        // Step 7: Check and seed sample products
+                        console.log("Checking for existing products...");
+                        pool.query(
+                          "SELECT COUNT(*) as count FROM products",
+                          (err, result) => {
+                            if (err) {
+                              console.error("Error checking products:", err);
+                              return;
+                            }
 
-                          const count = result.rows[0].count;
-                          console.log(`Found ${count} existing products`);
+                            const count = result.rows[0].count;
+                            console.log(`Found ${count} existing products`);
 
-                          if (count === 0) {
-                            console.log("⏳ Seeding sample products...");
-                            const sampleProducts = [
-                              [
-                                "The Great Gatsby",
-                                "F. Scott Fitzgerald",
-                                "12.99",
-                                "A classic American novel",
-                                "50",
-                                "Fiction",
-                                "https://picsum.photos/200/300?random=1",
-                              ],
-                              [
-                                "To Kill a Mockingbird",
-                                "Harper Lee",
-                                "14.99",
-                                "A gripping tale of racial injustice",
-                                "40",
-                                "Fiction",
-                                "https://picsum.photos/200/300?random=2",
-                              ],
-                              [
-                                "1984",
-                                "George Orwell",
-                                "13.99",
-                                "A dystopian novel about totalitarianism",
-                                "35",
-                                "Fiction",
-                                "https://picsum.photos/200/300?random=3",
-                              ],
-                              [
-                                "Pride and Prejudice",
-                                "Jane Austen",
-                                "11.99",
-                                "A romantic novel set in Georgian England",
-                                "45",
-                                "Romance",
-                                "https://picsum.photos/200/300?random=4",
-                              ],
-                              [
-                                "The Catcher in the Rye",
-                                "J.D. Salinger",
-                                "13.99",
-                                "A story of teenage rebellion",
-                                "30",
-                                "Fiction",
-                                "https://picsum.photos/200/300?random=5",
-                              ],
-                              [
-                                "Sapiens",
-                                "Yuval Noah Harari",
-                                "18.99",
-                                "A brief history of humankind",
-                                "60",
-                                "Non-fiction",
-                                "https://picsum.photos/200/300?random=6",
-                              ],
-                            ];
+                            if (count === 0) {
+                              console.log("⏳ Seeding sample products...");
+                              const sampleProducts = [
+                                [
+                                  "The Great Gatsby",
+                                  "F. Scott Fitzgerald",
+                                  "12.99",
+                                  "A classic American novel",
+                                  "50",
+                                  "Fiction",
+                                  "https://picsum.photos/200/300?random=1",
+                                ],
+                                [
+                                  "To Kill a Mockingbird",
+                                  "Harper Lee",
+                                  "14.99",
+                                  "A gripping tale of racial injustice",
+                                  "40",
+                                  "Fiction",
+                                  "https://picsum.photos/200/300?random=2",
+                                ],
+                                [
+                                  "1984",
+                                  "George Orwell",
+                                  "13.99",
+                                  "A dystopian novel about totalitarianism",
+                                  "35",
+                                  "Fiction",
+                                  "https://picsum.photos/200/300?random=3",
+                                ],
+                                [
+                                  "Pride and Prejudice",
+                                  "Jane Austen",
+                                  "11.99",
+                                  "A romantic novel set in Georgian England",
+                                  "45",
+                                  "Romance",
+                                  "https://picsum.photos/200/300?random=4",
+                                ],
+                                [
+                                  "The Catcher in the Rye",
+                                  "J.D. Salinger",
+                                  "13.99",
+                                  "A story of teenage rebellion",
+                                  "30",
+                                  "Fiction",
+                                  "https://picsum.photos/200/300?random=5",
+                                ],
+                                [
+                                  "Sapiens",
+                                  "Yuval Noah Harari",
+                                  "18.99",
+                                  "A brief history of humankind",
+                                  "60",
+                                  "Non-fiction",
+                                  "https://picsum.photos/200/300?random=6",
+                                ],
+                              ];
 
-                            // Insert all products immediately
-                            let i = 0;
-                            sampleProducts.forEach((product) => {
-                              i++;
-                              console.log(
-                                `  Inserting product ${i}: ${product[0]}`,
-                              );
-                              pool.query(
-                                "INSERT INTO products (title, author, price, description, stock, category, image_url) VALUES ($1, $2, $3, $4, $5, $6, $7)",
-                                product,
-                                (err) => {
-                                  if (err) {
-                                    console.error(
-                                      `  ERROR on product ${i}:`,
-                                      err.message,
-                                    );
-                                  } else {
-                                    console.log(`  ✓ Product ${i} inserted`);
-                                  }
-                                },
-                              );
-                            });
-                            console.log("✓ Seeded 6 sample products");
-                          }
+                              // Insert all products immediately
+                              let i = 0;
+                              sampleProducts.forEach((product) => {
+                                i++;
+                                console.log(
+                                  `  Inserting product ${i}: ${product[0]}`,
+                                );
+                                pool.query(
+                                  "INSERT INTO products (title, author, price, description, stock, category, image_url) VALUES ($1, $2, $3, $4, $5, $6, $7)",
+                                  product,
+                                  (err) => {
+                                    if (err) {
+                                      console.error(
+                                        `  ERROR on product ${i}:`,
+                                        err.message,
+                                      );
+                                    } else {
+                                      console.log(`  ✓ Product ${i} inserted`);
+                                    }
+                                  },
+                                );
+                              });
+                              console.log("✓ Seeded 6 sample products");
+                            }
 
                           // Always check for admin user
                           checkAdminUser();
                         },
                       );
+                      });
                     },
                   );
                 },
@@ -293,6 +297,72 @@ function initializeDatabase() {
       );
     },
   );
+}
+
+// Run database migrations to add new columns if they don't exist
+function runMigrations(callback) {
+  console.log("⏳ Checking for missing columns in orders table...");
+
+  const migrations = [
+    {
+      name: "Add full_name to orders",
+      column: "full_name",
+      query: "ALTER TABLE orders ADD COLUMN IF NOT EXISTS full_name TEXT",
+    },
+    {
+      name: "Add phone to orders",
+      column: "phone",
+      query: "ALTER TABLE orders ADD COLUMN IF NOT EXISTS phone TEXT",
+    },
+    {
+      name: "Add address to orders",
+      column: "address",
+      query: "ALTER TABLE orders ADD COLUMN IF NOT EXISTS address TEXT",
+    },
+    {
+      name: "Add city to orders",
+      column: "city",
+      query: "ALTER TABLE orders ADD COLUMN IF NOT EXISTS city TEXT",
+    },
+    {
+      name: "Add postal_code to orders",
+      column: "postal_code",
+      query: "ALTER TABLE orders ADD COLUMN IF NOT EXISTS postal_code TEXT",
+    },
+    {
+      name: "Add country to orders",
+      column: "country",
+      query: "ALTER TABLE orders ADD COLUMN IF NOT EXISTS country TEXT",
+    },
+    {
+      name: "Add notes to orders",
+      column: "notes",
+      query: "ALTER TABLE orders ADD COLUMN IF NOT EXISTS notes TEXT",
+    },
+  ];
+
+  let completedCount = 0;
+
+  migrations.forEach((migration) => {
+    pool.query(migration.query, (err) => {
+      if (err) {
+        // Column might already exist, which is fine
+        if (err.message.includes("already exists")) {
+          console.log(`✓ ${migration.name} (already exists)`);
+        } else {
+          console.warn(`⚠ Migration warning for ${migration.name}:`, err.message);
+        }
+      } else {
+        console.log(`✓ ${migration.name}`);
+      }
+
+      completedCount++;
+      if (completedCount === migrations.length) {
+        console.log("✓ Migrations completed");
+        if (callback) callback();
+      }
+    });
+  });
 }
 
 // Check and create admin user
@@ -345,6 +415,19 @@ function verifyToken(req, res, next) {
     res.status(401).json({ error: "Invalid token" });
   }
 }
+
+// MIGRATION ENDPOINT (admin only)
+app.post("/api/migrate", verifyToken, (req, res) => {
+  // Check if admin
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ error: "Only admins can run migrations" });
+  }
+
+  console.log("Manual migration triggered by admin");
+  runMigrations(() => {
+    res.json({ message: "Database migrations completed successfully" });
+  });
+});
 
 // AUTH ROUTES
 app.post("/api/auth/register", (req, res) => {
