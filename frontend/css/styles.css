@@ -1205,8 +1205,9 @@ body {
     cursor: pointer;
 }
 
-/* Products Table */
-.products-table {
+/* Products and Admins Tables */
+.products-table,
+.admins-table {
     width: 100%;
     border-collapse: collapse;
     background: white;
@@ -1408,6 +1409,7 @@ body {
 
     /* Tables Responsive */
     .products-table,
+    .admins-table,
     .orders-table {
         display: block;
         width: 100%;
@@ -1416,19 +1418,23 @@ body {
     }
 
     .products-table thead,
+    .admins-table thead,
     .orders-table thead {
         display: none;
     }
 
     .products-table tbody,
+    .admins-table tbody,
     .orders-table tbody,
     .products-table tr,
+    .admins-table tr,
     .orders-table tr {
         display: block;
         width: 100%;
     }
 
     .products-table tr,
+    .admins-table tr,
     .orders-table tr {
         background: white;
         margin-bottom: 1rem;
@@ -1438,6 +1444,7 @@ body {
     }
 
     .products-table td,
+    .admins-table td,
     .orders-table td {
         display: flex;
         justify-content: space-between;
@@ -1482,6 +1489,32 @@ body {
     }
 
     .products-table td:nth-child(6)::before {
+        content: "Actions";
+        font-weight: bold;
+    }
+
+    /* Admins Table Labels */
+    .admins-table td:nth-child(1)::before {
+        content: "ID";
+        font-weight: bold;
+    }
+
+    .admins-table td:nth-child(2)::before {
+        content: "Email";
+        font-weight: bold;
+    }
+
+    .admins-table td:nth-child(3)::before {
+        content: "Name";
+        font-weight: bold;
+    }
+
+    .admins-table td:nth-child(4)::before {
+        content: "Created";
+        font-weight: bold;
+    }
+
+    .admins-table td:nth-child(5)::before {
         content: "Actions";
         font-weight: bold;
     }
