@@ -160,6 +160,39 @@
                 </div>
             </div>
 
+            <!-- Credentials Modal -->
+            <div id="credentialsModal" class="modal">
+                <div class="modal-content credentials-modal">
+                    <span class="close" onclick="closeCredentialsModal()">&times;</span>
+                    <h3>✅ Admin Created Successfully!</h3>
+                    <p class="credentials-subtitle">Share these credentials with the new admin:</p>
+                    
+                    <div class="credentials-box">
+                        <div class="credential-item">
+                            <label>Email:</label>
+                            <div class="credential-field">
+                                <span id="credentialEmail"></span>
+                                <button onclick="copyToClipboard('credentialEmail', 'Email copied!')" class="copy-btn" title="Copy">📋 Copy</button>
+                            </div>
+                        </div>
+                        <div class="credential-item">
+                            <label>Password:</label>
+                            <div class="credential-field">
+                                <span id="credentialPassword" class="password-text"></span>
+                                <button onclick="copyToClipboard('credentialPassword', 'Password copied!')" class="copy-btn" title="Copy">📋 Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <p class="credentials-warning">⚠️ Make sure to share these credentials securely. The admin should change the password after first login.</p>
+                    
+                    <div class="modal-actions">
+                        <button onclick="copyAllCredentials()" class="btn btn-primary">Copy All</button>
+                        <button onclick="closeCredentialsModal()" class="btn btn-secondary">Done</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Order Details Modal -->
             <div id="orderDetailsModal" class="modal">
                 <div class="modal-content">
@@ -523,7 +556,11 @@
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    alert(`Admin created successfully!\n\nEmail: ${email}\nPassword: ${tempPassword}\n\nPlease share these credentials with the new admin.`);
+                    // Show credentials modal
+                    document.getElementById('credentialEmail').textContent = email;
+                    document.getElementById('credentialPassword').textContent = tempPassword;
+                    document.getElementById('credentialsModal').style.display = 'block';
+                    document.body.style.overflow = 'hidden';
                     event.target.reset();
                     loadAdmins();
                 }
@@ -532,6 +569,46 @@
                 console.error('Error:', err);
                 alert('Error creating admin');
             });
+        }
+
+        function copyToClipboard(elementId, message) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                // Show temporary success message
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                btn.style.backgroundColor = '#2ecc71';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.backgroundColor = '';
+                }, 2000);
+            }).catch(() => {
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        function copyAllCredentials() {
+            const email = document.getElementById('credentialEmail').textContent;
+            const password = document.getElementById('credentialPassword').textContent;
+            const allText = `Email: ${email}\nPassword: ${password}`;
+            
+            navigator.clipboard.writeText(allText).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✓ All Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            }).catch(() => {
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        function closeCredentialsModal() {
+            document.getElementById('credentialsModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
 
         function deleteAdmin(id, email) {
@@ -555,9 +632,14 @@
 
         // Close modal when clicking outside
         window.onclick = function(event) {
-            const modal = document.getElementById('orderDetailsModal');
-            if (event.target == modal) {
+            const orderModal = document.getElementById('orderDetailsModal');
+            const credentialsModal = document.getElementById('credentialsModal');
+            
+            if (event.target == orderModal) {
                 closeOrderDetailsModal();
+            }
+            if (event.target == credentialsModal) {
+                closeCredentialsModal();
             }
         }
     </script>

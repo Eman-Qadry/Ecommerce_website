@@ -1085,6 +1085,109 @@ body {
     user-select: none;
 }
 
+/* Credentials Modal Styling */
+.credentials-modal {
+    max-width: 450px !important;
+    width: 90% !important;
+}
+
+.credentials-modal h3 {
+    color: #2ecc71;
+    margin-bottom: 0.5rem;
+    font-size: 1.3rem;
+}
+
+.credentials-subtitle {
+    color: #7f8c8d;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.credentials-box {
+    background-color: #f9f9f9;
+    border: 2px solid #ecf0f1;
+    border-radius: 6px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.credential-item {
+    margin-bottom: 1rem;
+}
+
+.credential-item:last-child {
+    margin-bottom: 0;
+}
+
+.credential-item label {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.credential-field {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    gap: 0;
+}
+
+.credential-field span {
+    flex: 1;
+    padding: 0.7rem;
+    font-family: 'Courier New', monospace;
+    word-break: break-all;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.copy-btn {
+    padding: 0.7rem 0.9rem;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    border-left: 1px solid #2980b9;
+    transition: all 0.3s;
+}
+
+.copy-btn:hover {
+    background-color: #2980b9;
+}
+
+.copy-btn:active {
+    transform: scale(0.98);
+}
+
+.credentials-warning {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 1rem;
+    border-radius: 4px;
+    color: #856404;
+    font-size: 0.9rem;
+    margin: 1.5rem 0;
+    line-height: 1.5;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+.modal-actions .btn {
+    min-width: 110px;
+}
+
 .orders-table tbody tr:last-child td {
     border-bottom: none;
 }
