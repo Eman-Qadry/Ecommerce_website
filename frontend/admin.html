@@ -275,11 +275,15 @@
                         <td><span class="status status-${order.status}">${order.status.toUpperCase()}</span></td>
                         <td>${new Date(order.created_at).toLocaleDateString()}</td>
                         <td>
-                            <button onclick="viewOrderDetails(${order.id})" class="btn btn-small">View</button>
-                            <button onclick="quickUpdateOrderStatus(${order.id}, 'pending')" class="btn btn-small status-btn-pending" style="${order.status === 'pending' ? 'opacity: 0.5;' : ''}">Pending</button>
-                            <button onclick="quickUpdateOrderStatus(${order.id}, 'approved')" class="btn btn-small status-btn-approved" style="${order.status === 'approved' ? 'opacity: 0.5;' : ''}">Approved</button>
-                            <button onclick="quickUpdateOrderStatus(${order.id}, 'delivered')" class="btn btn-small status-btn-delivered" style="${order.status === 'delivered' ? 'opacity: 0.5;' : ''}">Delivered</button>
-                            <button onclick="quickUpdateOrderStatus(${order.id}, 'cancelled')" class="btn btn-small status-btn-cancelled" style="${order.status === 'cancelled' ? 'opacity: 0.5;' : ''}">Cancel</button>
+                            <div class="actions-group">
+                                <button onclick="viewOrderDetails(${order.id})" class="btn btn-action btn-action-view">View</button>
+                                <div class="status-actions">
+                                    <button onclick="quickUpdateOrderStatus(${order.id}, 'pending')" class="btn btn-action-mini status-btn-pending" title="Mark as Pending" ${order.status === 'pending' ? 'disabled' : ''}>⏱</button>
+                                    <button onclick="quickUpdateOrderStatus(${order.id}, 'approved')" class="btn btn-action-mini status-btn-approved" title="Mark as Approved" ${order.status === 'approved' ? 'disabled' : ''}>✓</button>
+                                    <button onclick="quickUpdateOrderStatus(${order.id}, 'delivered')" class="btn btn-action-mini status-btn-delivered" title="Mark as Delivered" ${order.status === 'delivered' ? 'disabled' : ''}>📦</button>
+                                    <button onclick="quickUpdateOrderStatus(${order.id}, 'cancelled')" class="btn btn-action-mini status-btn-cancelled" title="Mark as Cancelled" ${order.status === 'cancelled' ? 'disabled' : ''}>✕</button>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                 `).join('');

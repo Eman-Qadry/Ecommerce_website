@@ -962,6 +962,96 @@ body {
     font-size: 1rem;
 }
 
+/* Action Buttons Group */
+.actions-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.btn-action {
+    background-color: #3498db !important;
+    color: white !important;
+    padding: 0.5rem 0.8rem !important;
+    font-size: 0.85rem !important;
+    border-radius: 3px !important;
+    min-width: 60px;
+    text-align: center;
+}
+
+.btn-action:hover {
+    background-color: #2980b9 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.status-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.btn-action-mini {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    border-radius: 3px !important;
+    font-size: 0.7rem !important;
+    font-weight: bold;
+    color: white !important;
+    border: 2px solid transparent !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s !important;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.btn-action-mini:hover:not(:disabled) {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.btn-action-mini:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    border-color: rgba(0,0,0,0.2) !important;
+}
+
+.btn-action-mini.status-btn-pending {
+    background-color: #f39c12 !important;
+}
+
+.btn-action-mini.status-btn-pending:hover:not(:disabled) {
+    background-color: #e67e22 !important;
+}
+
+.btn-action-mini.status-btn-approved {
+    background-color: #3498db !important;
+}
+
+.btn-action-mini.status-btn-approved:hover:not(:disabled) {
+    background-color: #2980b9 !important;
+}
+
+.btn-action-mini.status-btn-delivered {
+    background-color: #2ecc71 !important;
+}
+
+.btn-action-mini.status-btn-delivered:hover:not(:disabled) {
+    background-color: #27ae60 !important;
+}
+
+.btn-action-mini.status-btn-cancelled {
+    background-color: #e74c3c !important;
+}
+
+.btn-action-mini.status-btn-cancelled:hover:not(:disabled) {
+    background-color: #c0392b !important;
+}
+
 .orders-table tbody tr:last-child td {
     border-bottom: none;
 }
