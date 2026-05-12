@@ -172,14 +172,14 @@
                             <label>Email:</label>
                             <div class="credential-field">
                                 <span id="credentialEmail"></span>
-                                <button onclick="copyToClipboard('credentialEmail', 'Email copied!')" class="copy-btn" title="Copy">📋 Copy</button>
+                                <button onclick="copyToClipboard('credentialEmail', this)" class="copy-btn" title="Copy">📋 Copy</button>
                             </div>
                         </div>
                         <div class="credential-item">
                             <label>Password:</label>
                             <div class="credential-field">
                                 <span id="credentialPassword" class="password-text"></span>
-                                <button onclick="copyToClipboard('credentialPassword', 'Password copied!')" class="copy-btn" title="Copy">📋 Copy</button>
+                                <button onclick="copyToClipboard('credentialPassword', this)" class="copy-btn" title="Copy">📋 Copy</button>
                             </div>
                         </div>
                     </div>
@@ -571,12 +571,11 @@
             });
         }
 
-        function copyToClipboard(elementId, message) {
+        function copyToClipboard(elementId, btn) {
             const element = document.getElementById(elementId);
             const text = element.textContent;
             navigator.clipboard.writeText(text).then(() => {
                 // Show temporary success message
-                const btn = event.target;
                 const originalText = btn.textContent;
                 btn.textContent = '✓ Copied!';
                 btn.style.backgroundColor = '#2ecc71';
