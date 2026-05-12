@@ -392,9 +392,16 @@ body {
     padding-top: 0.8rem;
     margin-top: 0.8rem;
 }
-.cart-summary button, .cart-summary a  {
+.cart-summary button  {
     width: 100%;
     margin: 1rem 0;
+}
+.cart-summary a{
+      display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-top: 1rem;
 }
 /* Auth Forms */
 .auth-form {
