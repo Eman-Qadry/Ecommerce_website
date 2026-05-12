@@ -187,7 +187,7 @@
                     <p class="credentials-warning">⚠️ Make sure to share these credentials securely. The admin should change the password after first login.</p>
                     
                     <div class="modal-actions">
-                        <button onclick="copyAllCredentials()" class="btn btn-primary">Copy All</button>
+                        <button onclick="copyAllCredentials(this)" class="btn btn-primary">Copy All</button>
                         <button onclick="closeCredentialsModal()" class="btn btn-secondary">Done</button>
                     </div>
                 </div>
@@ -588,13 +588,12 @@
             });
         }
 
-        function copyAllCredentials() {
+        function copyAllCredentials(btn) {
             const email = document.getElementById('credentialEmail').textContent;
             const password = document.getElementById('credentialPassword').textContent;
             const allText = `Email: ${email}\nPassword: ${password}`;
             
             navigator.clipboard.writeText(allText).then(() => {
-                const btn = event.target;
                 const originalText = btn.textContent;
                 btn.textContent = '✓ All Copied!';
                 setTimeout(() => {
