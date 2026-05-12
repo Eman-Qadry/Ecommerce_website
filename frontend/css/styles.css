@@ -392,7 +392,7 @@ body {
     padding-top: 0.8rem;
     margin-top: 0.8rem;
 }
-.cart-summary button, a  {
+.cart-summary button, .cart-summary a  {
     width: 100%;
     margin: 1rem 0;
 }
