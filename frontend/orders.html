@@ -83,7 +83,7 @@
                     <div class="order-card">
                         <div class="order-header">
                             <div class="order-info">
-                                <h3>Order #${order.id}</h3>
+                                <h3>Order from ${new Date(order.created_at).toLocaleDateString()}</h3>
                                 <p>Date: ${new Date(order.created_at).toLocaleDateString()}</p>
                             </div>
                             <div class="order-status">
@@ -129,7 +129,7 @@
                 `).join('');
 
                 detailsDiv.innerHTML = `
-                    <h3>Order #${order.id}</h3>
+                    <h3>Order from ${new Date(order.created_at).toLocaleDateString()}</h3>
                     <div class="order-detail-info">
                         <div class="detail-section">
                             <h4>Status</h4>
