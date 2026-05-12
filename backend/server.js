@@ -1086,6 +1086,80 @@ app.get("/api/admin/products", verifyToken, (req, res) => {
   });
 });
 
+// ADMIN MANAGEMENT ROUTES
+// Get all admins
+app.get("/api/admin/admins", verifyToken, (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  db.all(
+    "SELECT id, email, name, created_at FROM users WHERE role = 'admin' ORDER BY created_at DESC",
+    [],
+    (err, admins) => {
+      if (err) return res.status(500).json({ error: "Database error" });
+      res.json(admins);
+    }
+  );
+});
+
+// Create new admin
+app.post("/api/admin/admins", verifyToken, (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  const { email, name, password } = req.body;
+
+  if (!email || !name || !password) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ error: "Password must be at least 6 characters" });
+  }
+
+  const hashedPassword = bcryptjs.hashSync(password, 10);
+
+  pool.query(
+    "INSERT INTO users (email, password, name, role) VALUES ($1, $2, $3, $4) RETURNING id, email, name, created_at",
+    [email, hashedPassword, name, "admin"],
+    (err, result) => {
+      if (err) {
+        if (err.message.includes("duplicate key")) {
+          return res.status(400).json({ error: "Email already exists" });
+        }
+        return res.status(500).json({ error: "Database error" });
+      }
+      const admin = result.rows[0];
+      res.json({ message: "Admin created successfully", admin });
+    }
+  );
+});
+
+// Delete admin
+app.delete("/api/admin/admins/:id", verifyToken, (req, res) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ error: "Unauthorized" });
+  }
+
+  const adminId = req.params.id;
+
+  // Prevent deleting yourself
+  if (parseInt(adminId) === req.user.id) {
+    return res.status(400).json({ error: "Cannot delete your own admin account" });
+  }
+
+  db.run(
+    "DELETE FROM users WHERE id = $1 AND role = 'admin'",
+    [adminId],
+    (err) => {
+      if (err) return res.status(500).json({ error: "Database error" });
+      res.json({ message: "Admin deleted successfully" });
+    }
+  );
+});
+
 // Serve frontend for all non-API routes (SPA support)
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../frontend/index.html"));

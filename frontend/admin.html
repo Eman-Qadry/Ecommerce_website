@@ -26,6 +26,7 @@
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="switchTab('products')">Manage Products</button>
                 <button class="tab-btn" onclick="switchTab('orders')">Manage Orders</button>
+                <button class="tab-btn" onclick="switchTab('admins')">Manage Admins</button>
             </div>
 
             <!-- Products Tab -->
@@ -119,6 +120,47 @@
                 </div>
             </div>
 
+            <!-- Admins Tab -->
+            <div id="adminsTab" class="tab-content">
+                <h2>Manage Admins</h2>
+                <div class="admin-section">
+                    <h3>Add New Admin</h3>
+                    <form onsubmit="handleAddAdmin(event)">
+                        <div class="form-group">
+                            <label>Email:</label>
+                            <input type="email" id="adminEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Name:</label>
+                            <input type="text" id="adminName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Password:</label>
+                            <input type="password" id="adminPassword" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Admin</button>
+                    </form>
+                </div>
+
+                <div class="admin-section">
+                    <h3>Current Admins</h3>
+                    <table class="products-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Email</th>
+                                <th>Name</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminsTable">
+                            <!-- Admins will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- Order Details Modal -->
             <div id="orderDetailsModal" class="modal">
                 <div class="modal-content">
@@ -149,6 +191,7 @@
 
             loadAdminProducts();
             loadAdminOrders();
+            loadAdmins();
         });
 
         // Tab switching functionality
@@ -172,6 +215,8 @@
             // Reload data for the tab
             if (tabName === 'orders') {
                 loadAdminOrders();
+            } else if (tabName === 'admins') {
+                loadAdmins();
             }
         }
 
@@ -231,8 +276,10 @@
                         <td>${new Date(order.created_at).toLocaleDateString()}</td>
                         <td>
                             <button onclick="viewOrderDetails(${order.id})" class="btn btn-small">View</button>
-                            ${order.status === 'pending' ? `<button onclick="approveOrder(${order.id})" class="btn btn-small" style="background-color: #27ae60; color: white;">Approve</button>` : ''}
-                            ${order.status !== 'cancelled' ? `<button onclick="cancelOrderAdmin(${order.id})" class="btn btn-danger btn-small">Cancel</button>` : ''}
+                            <button onclick="quickUpdateOrderStatus(${order.id}, 'pending')" class="btn btn-small status-btn-pending" style="${order.status === 'pending' ? 'opacity: 0.5;' : ''}">Pending</button>
+                            <button onclick="quickUpdateOrderStatus(${order.id}, 'approved')" class="btn btn-small status-btn-approved" style="${order.status === 'approved' ? 'opacity: 0.5;' : ''}">Approved</button>
+                            <button onclick="quickUpdateOrderStatus(${order.id}, 'delivered')" class="btn btn-small status-btn-delivered" style="${order.status === 'delivered' ? 'opacity: 0.5;' : ''}">Delivered</button>
+                            <button onclick="quickUpdateOrderStatus(${order.id}, 'cancelled')" class="btn btn-small status-btn-cancelled" style="${order.status === 'cancelled' ? 'opacity: 0.5;' : ''}">Cancel</button>
                         </td>
                     </tr>
                 `).join('');
@@ -261,19 +308,17 @@
                     </div>
                 `).join('');
 
-                const statusOptions = ['pending', 'approved', 'delivered', 'cancelled'];
-                const statusSelect = statusOptions.map(s => 
-                    `<option value="${s}" ${s === order.status ? 'selected' : ''}>${s.toUpperCase()}</option>`
-                ).join('');
-
                 const detailsHTML = `
                     <h3>Order #${order.id}</h3>
                     <div class="order-detail-info">
                         <div class="detail-section">
                             <h4>Order Status</h4>
-                            <select id="statusSelect" onchange="updateOrderStatus(${order.id}, this.value)">
-                                ${statusSelect}
-                            </select>
+                            <div class="status-buttons-group">
+                                <button onclick="updateOrderStatus(${order.id}, 'pending')" class="btn btn-small status-btn-pending" style="${order.status === 'pending' ? 'opacity: 0.5;' : ''}">Pending</button>
+                                <button onclick="updateOrderStatus(${order.id}, 'approved')" class="btn btn-small status-btn-approved" style="${order.status === 'approved' ? 'opacity: 0.5;' : ''}">Approved</button>
+                                <button onclick="updateOrderStatus(${order.id}, 'delivered')" class="btn btn-small status-btn-delivered" style="${order.status === 'delivered' ? 'opacity: 0.5;' : ''}">Delivered</button>
+                                <button onclick="updateOrderStatus(${order.id}, 'cancelled')" class="btn btn-small status-btn-cancelled" style="${order.status === 'cancelled' ? 'opacity: 0.5;' : ''}">Cancel</button>
+                            </div>
                         </div>
                         <div class="detail-section">
                             <h4>Customer Information</h4>
@@ -336,14 +381,16 @@
             })
             .then(res => res.json())
             .then(data => {
-                alert('Order status updated successfully');
-                closeOrderDetailsModal();
+                // Reload orders list without closing modal
                 loadAdminOrders();
             })
             .catch(err => {
                 console.error('Error updating status:', err);
-                alert('Error updating order status');
             });
+        }
+
+        function quickUpdateOrderStatus(orderId, status) {
+            updateOrderStatus(orderId, status);
         }
 
         function approveOrder(orderId) {
@@ -415,6 +462,85 @@
 
         function editProduct(id) {
             alert('Edit functionality can be added - currently delete and re-add to modify');
+        }
+
+        // Admin Management Functions
+        function loadAdmins() {
+            const token = localStorage.getItem('token');
+            fetch(`${API_URL}/api/admin/admins`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(admins => {
+                const tbody = document.getElementById('adminsTable');
+                tbody.innerHTML = admins.map(admin => `
+                    <tr>
+                        <td>${admin.id}</td>
+                        <td>${admin.email}</td>
+                        <td>${admin.name}</td>
+                        <td>${new Date(admin.created_at).toLocaleDateString()}</td>
+                        <td>
+                            <button onclick="deleteAdmin(${admin.id}, '${admin.email}')" class="btn btn-danger btn-small">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            })
+            .catch(err => {
+                console.error('Error loading admins:', err);
+            });
+        }
+
+        function handleAddAdmin(event) {
+            event.preventDefault();
+            const token = localStorage.getItem('token');
+            
+            const adminData = {
+                email: document.getElementById('adminEmail').value,
+                name: document.getElementById('adminName').value,
+                password: document.getElementById('adminPassword').value
+            };
+
+            fetch(`${API_URL}/api/admin/admins`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(adminData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert('Admin created successfully!');
+                    event.target.reset();
+                    loadAdmins();
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('Error creating admin');
+            });
+        }
+
+        function deleteAdmin(id, email) {
+            if (!confirm(`Are you sure you want to delete admin "${email}"?`)) return;
+
+            const token = localStorage.getItem('token');
+            fetch(`${API_URL}/api/admin/admins/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('Admin deleted successfully');
+                loadAdmins();
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('Error deleting admin');
+            });
         }
 
         // Close modal when clicking outside
