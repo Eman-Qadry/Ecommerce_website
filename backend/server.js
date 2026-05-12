@@ -586,9 +586,7 @@ app.delete("/api/users/profile", verifyToken, (req, res) => {
     if (err) {
       return res.status(500).json({ error: "Database error" });
     }
-    // Also delete related orders and cart
-    db.run("DELETE FROM cart WHERE user_id = $1", [req.user.id]);
-    db.run("DELETE FROM orders WHERE user_id = $1", [req.user.id]);
+
     res.json({ message: "Account deleted successfully" });
   });
 });
