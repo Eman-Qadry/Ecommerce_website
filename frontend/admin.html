@@ -497,9 +497,95 @@
         }
 
         function editProduct(id) {
-            alert('Edit functionality can be added - currently delete and re-add to modify');
-        }
+    const token = localStorage.getItem('token');
 
+    // Get current product data
+    fetch(`${API_URL}/api/products/${id}`)
+    .then(res => res.json())
+    .then(product => {
+
+        // Fill form with current data
+        document.getElementById('title').value = product.title;
+        document.getElementById('author').value = product.author;
+        document.getElementById('price').value = product.price;
+        document.getElementById('stock').value = product.stock;
+        document.getElementById('category').value = product.category;
+        document.getElementById('description').value = product.description;
+        document.getElementById('image_url').value = product.image_url;
+
+        // Change button text
+        const submitBtn = document.querySelector('#productsTab form button[type="submit"]');
+        submitBtn.textContent = 'Update Product';
+
+        // Remove old submit listener by cloning form
+        const oldForm = document.querySelector('#productsTab form');
+        const newForm = oldForm.cloneNode(true);
+        oldForm.parentNode.replaceChild(newForm, oldForm);
+
+        // Refill values after clone
+        document.getElementById('title').value = product.title;
+        document.getElementById('author').value = product.author;
+        document.getElementById('price').value = product.price;
+        document.getElementById('stock').value = product.stock;
+        document.getElementById('category').value = product.category;
+        document.getElementById('description').value = product.description;
+        document.getElementById('image_url').value = product.image_url;
+
+        document.querySelector('#productsTab form button[type="submit"]').textContent = 'Update Product';
+
+        // Handle update submit
+        newForm.onsubmit = function(event) {
+            event.preventDefault();
+
+            const updatedProduct = {
+                title: document.getElementById('title').value,
+                author: document.getElementById('author').value,
+                price: parseFloat(document.getElementById('price').value),
+                stock: parseInt(document.getElementById('stock').value),
+                category: document.getElementById('category').value,
+                description: document.getElementById('description').value,
+                image_url: document.getElementById('image_url').value
+            };
+
+            fetch(`${API_URL}/api/admin/products/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(updatedProduct)
+            })
+            .then(res => res.json())
+            .then(data => {
+                alert('Product updated successfully!');
+
+                // Reset form
+                newForm.reset();
+
+                // Restore Add Product mode
+                document.querySelector('#productsTab form button[type="submit"]').textContent = 'Add Product';
+                newForm.onsubmit = handleAddProduct;
+
+                // Reload products
+                loadAdminProducts();
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                alert('Error updating product');
+            });
+        };
+
+        // Scroll to form
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    })
+    .catch(err => {
+        console.error('Error loading product:', err);
+        alert('Error loading product');
+    });
+}
         // Admin Management Functions
         function loadAdmins() {
             const token = localStorage.getItem('token');
