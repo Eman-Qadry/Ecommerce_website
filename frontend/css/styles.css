@@ -1389,3 +1389,168 @@ body {
         padding: 10px 15px;
     }
 }
+/* =========================================
+   Responsive Tables for Admin Panel
+========================================= */
+
+@media (max-width: 768px) {
+
+    /* Admin Tabs */
+    .admin-tabs {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .tab-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Tables Responsive */
+    .products-table,
+    .orders-table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .products-table thead,
+    .orders-table thead {
+        display: none;
+    }
+
+    .products-table tbody,
+    .orders-table tbody,
+    .products-table tr,
+    .orders-table tr {
+        display: block;
+        width: 100%;
+    }
+
+    .products-table tr,
+    .orders-table tr {
+        background: white;
+        margin-bottom: 1rem;
+        border-radius: 10px;
+        padding: 1rem;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .products-table td,
+    .orders-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-align: right;
+        padding: 0.7rem 0;
+        border: none;
+        border-bottom: 1px solid #eee;
+        white-space: normal;
+        gap: 1rem;
+    }
+
+    .products-table td:last-child,
+    .orders-table td:last-child {
+        border-bottom: none;
+    }
+
+    /* Products Table Labels */
+    .products-table td:nth-child(1)::before {
+        content: "ID";
+        font-weight: bold;
+    }
+
+    .products-table td:nth-child(2)::before {
+        content: "Title";
+        font-weight: bold;
+    }
+
+    .products-table td:nth-child(3)::before {
+        content: "Author / Email";
+        font-weight: bold;
+    }
+
+    .products-table td:nth-child(4)::before {
+        content: "Price / Created";
+        font-weight: bold;
+    }
+
+    .products-table td:nth-child(5)::before {
+        content: "Stock / Actions";
+        font-weight: bold;
+    }
+
+    .products-table td:nth-child(6)::before {
+        content: "Actions";
+        font-weight: bold;
+    }
+
+    /* Orders Table Labels */
+    .orders-table td:nth-child(1)::before {
+        content: "Order ID";
+        font-weight: bold;
+    }
+
+    .orders-table td:nth-child(2)::before {
+        content: "Customer";
+        font-weight: bold;
+    }
+
+    .orders-table td:nth-child(3)::before {
+        content: "Email";
+        font-weight: bold;
+    }
+
+    .orders-table td:nth-child(4)::before {
+        content: "Total";
+        font-weight: bold;
+    }
+
+    .orders-table td:nth-child(5)::before {
+        content: "Status";
+        font-weight: bold;
+    }
+
+    .orders-table td:nth-child(6)::before {
+        content: "Date";
+        font-weight: bold;
+    }
+
+    .orders-table td:nth-child(7)::before {
+        content: "Actions";
+        font-weight: bold;
+    }
+
+    /* Action Buttons */
+    .actions-group {
+        width: 100%;
+        align-items: flex-end;
+    }
+
+    .status-actions {
+        justify-content: flex-end;
+    }
+
+    .btn,
+    .btn-small,
+    .btn-action {
+        font-size: 0.85rem;
+    }
+
+    /* Admin Forms */
+    .admin-section {
+        padding: 1rem;
+    }
+
+    .email-input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .email-domain {
+        border-left: none;
+        border-top: 1px solid #ddd;
+        text-align: center;
+    }
+}
