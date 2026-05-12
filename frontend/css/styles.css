@@ -1052,6 +1052,39 @@ body {
     background-color: #c0392b !important;
 }
 
+/* Email Input Group with Domain */
+.email-input-group {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+    background: white;
+}
+
+.email-input-group input {
+    border: none !important;
+    padding: 0.7rem !important;
+    flex: 1;
+    font-size: 1rem;
+    background: white;
+}
+
+.email-input-group input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.email-domain {
+    padding: 0.7rem 0.8rem;
+    background-color: #ecf0f1;
+    color: #7f8c8d;
+    font-weight: 500;
+    white-space: nowrap;
+    border-left: 1px solid #ddd;
+    user-select: none;
+}
+
 .orders-table tbody tr:last-child td {
     border-bottom: none;
 }

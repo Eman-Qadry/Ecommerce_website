@@ -128,15 +128,14 @@
                     <form onsubmit="handleAddAdmin(event)">
                         <div class="form-group">
                             <label>Email:</label>
-                            <input type="email" id="adminEmail" required>
+                            <div class="email-input-group">
+                                <input type="text" id="adminEmail" placeholder="username" required pattern="[a-zA-Z0-9._-]+">
+                                <span class="email-domain">@bookstore.com</span>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Name:</label>
                             <input type="text" id="adminName" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Password:</label>
-                            <input type="password" id="adminPassword" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Add Admin</button>
                     </form>
@@ -497,11 +496,18 @@
         function handleAddAdmin(event) {
             event.preventDefault();
             const token = localStorage.getItem('token');
+            const username = document.getElementById('adminEmail').value.trim();
+            
+            // Append @bookstore.com to the username
+            const email = username + '@bookstore.com';
+            
+            // Generate a temporary password
+            const tempPassword = 'Admin123!' + Math.random().toString(36).substring(2, 8).toUpperCase();
             
             const adminData = {
-                email: document.getElementById('adminEmail').value,
+                email: email,
                 name: document.getElementById('adminName').value,
-                password: document.getElementById('adminPassword').value
+                password: tempPassword
             };
 
             fetch(`${API_URL}/api/admin/admins`, {
@@ -517,7 +523,7 @@
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    alert('Admin created successfully!');
+                    alert(`Admin created successfully!\n\nEmail: ${email}\nPassword: ${tempPassword}\n\nPlease share these credentials with the new admin.`);
                     event.target.reset();
                     loadAdmins();
                 }
